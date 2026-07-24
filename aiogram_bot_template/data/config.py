@@ -15,7 +15,7 @@ env.read_env()
 BOT_TOKEN: str = env.str("BOT_TOKEN")
 BOT_ID: str = BOT_TOKEN.split(":", maxsplit=1)[0]
 
-LOGGING_LEVEL: int = env.int("LOGGING_LEVEL", 10)
+LOGGING_LEVEL: int = env.int("LOGGING_LEVEL", 20)
 
 USE_PG_LINK: bool = env.bool("USE_PG_LINK", False)
 

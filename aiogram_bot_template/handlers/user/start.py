@@ -14,7 +14,7 @@ async def start(msg: types.Message, state: FSMContext) -> None:
     try:
         await pool.execute(
             """
-            INSERT INTO "user" (telegram_id, first_name, last_name, username)
+            INSERT INTO "user_profile" (telegram_id, first_name, last_name, username)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT (telegram_id)
             DO UPDATE SET

@@ -7,7 +7,7 @@ from aiogram import types
 from aiogram_bot_template.data import config
 
 
-async def coin(msg: types.Message) -> None:
+async def coin(msg: types.Message, **kwargs: object) -> None:
     if msg.from_user is None:
         return
 
@@ -15,17 +15,11 @@ async def coin(msg: types.Message) -> None:
 
     pool = await asyncpg.create_pool(config.PG_LINK, min_size=1, max_size=1)
     try:
-        user_row = await pool.fetchrow(
-            """
-            SELECT coins_cooldown
-            FROM "user"
-            WHERE telegram_id = $1
-            """,
-            msg.from_user.id,
-        )
-
+        user_row = kwargs.get("user_profile")
         now = datetime.now(timezone.utc)
-        cooldown_until = user_row["coins_cooldown"] if user_row is not None else None
+        cooldown_until = None
+        if isinstance(user_row, dict):
+            cooldown_until = user_row.get("coins_cooldown")
 
         if cooldown_until is not None and cooldown_until > now:
             remaining_seconds = int((cooldown_until - now).total_seconds())
@@ -40,11 +34,11 @@ async def coin(msg: types.Message) -> None:
 
         await pool.execute(
             """
-            INSERT INTO "user" (telegram_id, coins, coins_cooldown)
+            INSERT INTO "user_profile" (telegram_id, coins, coins_cooldown)
             VALUES ($1, $2, $3)
             ON CONFLICT (telegram_id)
             DO UPDATE SET
-                coins = "user".coins + EXCLUDED.coins,
+                coins = "user_profile".coins + EXCLUDED.coins,
                 coins_cooldown = EXCLUDED.coins_cooldown
             """,
             msg.from_user.id,

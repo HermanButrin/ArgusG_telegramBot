@@ -14,7 +14,7 @@ from redis.asyncio import Redis
 
 from aiogram_bot_template import handlers, utils, web_handlers
 from aiogram_bot_template.data import config
-from aiogram_bot_template.middlewares import StructLoggingMiddleware, UserActivityMiddleware
+from aiogram_bot_template.middlewares import StructLoggingMiddleware, UserActivityMiddleware, UserProfileMiddleware
 
 if TYPE_CHECKING:
     import asyncpg
@@ -93,6 +93,7 @@ def setup_handlers(dp: Dispatcher) -> None:
 
 def setup_middlewares(dp: Dispatcher) -> None:
     dp.update.outer_middleware(StructLoggingMiddleware(logger=dp["aiogram_logger"]))
+    dp.update.outer_middleware(UserProfileMiddleware())
     dp.update.outer_middleware(UserActivityMiddleware())
 
 

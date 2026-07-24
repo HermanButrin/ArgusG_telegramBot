@@ -2,11 +2,14 @@ from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from typing import Any
 
+import asyncpg
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Update
 
+from aiogram_bot_template.data import config
 
-class UserActivityMiddleware(BaseMiddleware):
+
+class UserProfileMiddleware(BaseMiddleware):
     def __init__(self) -> None:
         super().__init__()
 
@@ -35,21 +38,30 @@ class UserActivityMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         with suppress(Exception):
-            await db_pool.execute(
+            user_row = await db_pool.fetchrow(
                 """
-                INSERT INTO "user_profile" (telegram_id)
-                VALUES ($1)
-                ON CONFLICT (telegram_id) DO NOTHING
-                """,
-                user.id,
-            )
-            await db_pool.execute(
-                """
-                UPDATE "user_profile"
-                SET last_active_at = NOW()
+                SELECT
+                    telegram_id,
+                    first_name,
+                    last_name,
+                    username,
+                    coins,
+                    level,
+                    xp,
+                    is_banned,
+                    created_at,
+                    updated_at,
+                    last_active_at,
+                    coins_cooldown
+                FROM "user_profile"
                 WHERE telegram_id = $1
                 """,
                 user.id,
             )
+
+            if user_row is not None:
+                data["user_profile"] = dict(user_row)
+            else:
+                data["user_profile"] = None
 
         return await handler(event, data)

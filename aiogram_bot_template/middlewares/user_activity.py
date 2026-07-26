@@ -5,6 +5,8 @@ from typing import Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Update
 
+from aiogram_bot_template.db.user import ensure_user_exists, update_last_active
+
 
 class UserActivityMiddleware(BaseMiddleware):
     def __init__(self) -> None:
@@ -35,21 +37,7 @@ class UserActivityMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         with suppress(Exception):
-            await db_pool.execute(
-                """
-                INSERT INTO "user_profile" (telegram_id)
-                VALUES ($1)
-                ON CONFLICT (telegram_id) DO NOTHING
-                """,
-                user.id,
-            )
-            await db_pool.execute(
-                """
-                UPDATE "user_profile"
-                SET last_active_at = NOW()
-                WHERE telegram_id = $1
-                """,
-                user.id,
-            )
+                await ensure_user_exists(db_pool, user.id)
+                await update_last_active(db_pool, user.id)
 
         return await handler(event, data)

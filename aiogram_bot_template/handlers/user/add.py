@@ -80,11 +80,16 @@ async def add(msg: types.Message, **kwargs: object) -> None:
         )
         return
 
-    if await item_exists(name):
+    db_pool = kwargs.get("db_pool")
+    if db_pool is None:
+        await msg.answer("❌ Внутренняя ошибка: отсутствует подключение к базе данных.")
+        return
+
+    if await item_exists(db_pool, name):
         await msg.answer("❌ Предмет с таким названием уже существует.")
         return
 
-    await insert_item(name, description, price, rarity)
+    await insert_item(db_pool, name, description, price, rarity)
 
     rarity_capitalized = rarity.capitalize()
     description_text = description if description is not None and description != "" else "-"

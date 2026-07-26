@@ -1,8 +1,7 @@
-import asyncpg
 from aiogram import types
 from aiogram.filters import Command
 
-from aiogram_bot_template.data import config
+from aiogram_bot_template.db.user import ban_user_by_username
 
 
 async def ban(msg: types.Message, **kwargs: object) -> None:
@@ -23,25 +22,12 @@ async def ban(msg: types.Message, **kwargs: object) -> None:
         await msg.answer("Используйте формат: /ban @username")
         return
 
-    pool = await asyncpg.create_pool(config.PG_LINK, min_size=1, max_size=1)
-    try:
-        await pool.execute(
-            """
-            UPDATE "user_profile"
-            SET is_banned = TRUE
-            WHERE username = $1
-            """,
-            username,
-        )
+    db_pool = kwargs.get("db_pool")
+    if db_pool is None:
+        return
 
-        affected = await pool.fetchval(
-            'SELECT COUNT(*) FROM "user_profile" WHERE username = $1',
-            username,
-        )
-
-        if affected and int(affected) > 0:
-            await msg.answer(f"Пользователь @{username} забанен.")
-        else:
-            await msg.answer(f"Пользователь @{username} не найден.")
-    finally:
-        await pool.close()
+    updated = await ban_user_by_username(db_pool, username)
+    if updated:
+        await msg.answer(f"Пользователь @{username} забанен.")
+    else:
+        await msg.answer(f"Пользователь @{username} не найден.")

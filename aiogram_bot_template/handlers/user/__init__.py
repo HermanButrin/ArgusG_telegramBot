@@ -4,7 +4,7 @@ from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram_bot_template import states
 from aiogram_bot_template.filters import AdminFilter, BannedFilter, ChatTypeFilter, TextFilter
 
-from . import ban, coin, profile, start
+from . import add, ban, coin, profile, start
 
 
 def prepare_router() -> Router:
@@ -15,6 +15,7 @@ def prepare_router() -> Router:
     user_router.message.register(start.start, CommandStart())
     user_router.message.register(profile.profile, Command("profile"))
     user_router.message.register(coin.coin, Command("coin"))
+    user_router.message.register(add.add, Command("add"), AdminFilter())
     user_router.message.register(ban.ban, Command("ban"), AdminFilter())
     user_router.message.register(
         start.start,

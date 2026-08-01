@@ -60,8 +60,6 @@ async def fetch_user(
             last_name,
             username,
             coins,
-            level,
-            xp,
             is_banned,
             is_admin,
             created_at,

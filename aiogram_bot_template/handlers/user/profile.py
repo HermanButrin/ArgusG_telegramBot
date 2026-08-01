@@ -50,8 +50,6 @@ async def profile(msg: types.Message, **kwargs: object) -> None:
                 f"Имя: {html.quote(full_name)}",
                 f"Тег: @{html.quote(tag)}" if tag != "—" else f"Тег: {tag}",
                 f"Coins: {user_row.get('coins')}",
-                f"Level: {user_row.get('level')}",
-                f"XP: {user_row.get('xp')}",
                 f"Created at: {created_at}",
                 f"Updated at: {updated_at}",
                 f"Last active at: {last_active_at}",

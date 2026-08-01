@@ -1,10 +1,11 @@
 import asyncpg
+from asyncpg import pool
 
 
 async def ensure_user_exists(pool: asyncpg.Pool, telegram_id: int) -> None:
     await pool.execute(
         """
-        INSERT INTO "user_profile" (telegram_id)
+        INSERT INTO "user" (telegram_id)
         VALUES ($1)
         ON CONFLICT (telegram_id) DO NOTHING
         """,
@@ -15,7 +16,7 @@ async def ensure_user_exists(pool: asyncpg.Pool, telegram_id: int) -> None:
 async def update_last_active(pool: asyncpg.Pool, telegram_id: int) -> None:
     await pool.execute(
         """
-        UPDATE "user_profile"
+        UPDATE "user"
         SET last_active_at = NOW()
         WHERE telegram_id = $1
         """,
@@ -23,7 +24,7 @@ async def update_last_active(pool: asyncpg.Pool, telegram_id: int) -> None:
     )
 
 
-async def upsert_user_profile(
+async def upsert_user(
     pool: asyncpg.Pool,
     telegram_id: int,
     first_name: str | None,
@@ -32,7 +33,7 @@ async def upsert_user_profile(
 ) -> None:
     await pool.execute(
         """
-        INSERT INTO "user_profile" (telegram_id, first_name, last_name, username)
+        INSERT INTO "user" (telegram_id, first_name, last_name, username)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (telegram_id)
         DO UPDATE SET
@@ -47,7 +48,7 @@ async def upsert_user_profile(
     )
 
 
-async def fetch_user_profile(
+async def fetch_user(
     pool: asyncpg.Pool,
     telegram_id: int,
 ) -> dict[str, object] | None:
@@ -67,7 +68,7 @@ async def fetch_user_profile(
             updated_at,
             last_active_at,
             coins_cooldown
-        FROM "user_profile"
+        FROM "user"
         WHERE telegram_id = $1
         """,
         telegram_id,
@@ -77,7 +78,7 @@ async def fetch_user_profile(
 
 async def is_user_admin(pool: asyncpg.Pool, telegram_id: int) -> bool:
     user_row = await pool.fetchrow(
-        'SELECT is_admin FROM "user_profile" WHERE telegram_id = $1',
+        'SELECT is_admin FROM "user" WHERE telegram_id = $1',
         telegram_id,
     )
     if user_row is None:
@@ -87,7 +88,7 @@ async def is_user_admin(pool: asyncpg.Pool, telegram_id: int) -> bool:
 
 async def is_user_not_banned(pool: asyncpg.Pool, telegram_id: int) -> bool:
     user_row = await pool.fetchrow(
-        'SELECT is_banned FROM "user_profile" WHERE telegram_id = $1',
+        'SELECT is_banned FROM "user" WHERE telegram_id = $1',
         telegram_id,
     )
     if user_row is None:
@@ -98,7 +99,7 @@ async def is_user_not_banned(pool: asyncpg.Pool, telegram_id: int) -> bool:
 async def ban_user_by_username(pool: asyncpg.Pool, username: str) -> bool:
     updated_user = await pool.fetchrow(
         """
-        UPDATE "user_profile"
+        UPDATE "user"
         SET is_banned = TRUE
         WHERE username = $1
         RETURNING telegram_id
@@ -116,11 +117,11 @@ async def award_user_coins(
 ) -> None:
     await pool.execute(
         """
-        INSERT INTO "user_profile" (telegram_id, coins, coins_cooldown)
+        INSERT INTO "user" (telegram_id, coins, coins_cooldown)
         VALUES ($1, $2, $3)
         ON CONFLICT (telegram_id)
         DO UPDATE SET
-            coins = "user_profile".coins + EXCLUDED.coins,
+            coins = "user".coins + EXCLUDED.coins,
             coins_cooldown = EXCLUDED.coins_cooldown
         """,
         telegram_id,

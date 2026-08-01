@@ -25,7 +25,7 @@ async def profile(msg: types.Message, **kwargs: object) -> None:
     if msg.from_user is None:
         return
 
-    user_row = kwargs.get("user_profile")
+    user_row = kwargs.get("user")
     if not user_row:
         await msg.answer(
             "Профиль пока не найден. Сначала нажмите /start, чтобы сохранить пользователя.",

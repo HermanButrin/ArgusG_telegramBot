@@ -15,7 +15,7 @@ async def coin(msg: types.Message, **kwargs: object) -> None:
     if db_pool is None:
         return
 
-    user_row = kwargs.get("user_profile")
+    user_row = kwargs.get("user")
     now = datetime.now(timezone.utc)
     cooldown_until = None
     if isinstance(user_row, dict):

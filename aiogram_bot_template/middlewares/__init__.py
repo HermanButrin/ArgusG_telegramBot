@@ -1,3 +1,3 @@
 from .logging import StructLoggingMiddleware as StructLoggingMiddleware
-from .user_profile import UserProfileMiddleware as UserProfileMiddleware
+from .user import UserProfileMiddleware as UserProfileMiddleware
 from .user_activity import UserActivityMiddleware as UserActivityMiddleware

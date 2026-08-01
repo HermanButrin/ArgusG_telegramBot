@@ -2,7 +2,7 @@ from aiogram import html, types
 from aiogram.fsm.context import FSMContext
 
 from aiogram_bot_template import states
-from aiogram_bot_template.db.user import upsert_user_profile
+from aiogram_bot_template.db.user import upsert_user
 
 
 async def start(msg: types.Message, state: FSMContext, **kwargs: object) -> None:
@@ -13,7 +13,7 @@ async def start(msg: types.Message, state: FSMContext, **kwargs: object) -> None
     if db_pool is None:
         return
 
-    await upsert_user_profile(
+    await upsert_user(
         db_pool,
         msg.from_user.id,
         msg.from_user.first_name,

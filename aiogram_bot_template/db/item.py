@@ -1,8 +1,3 @@
-from datetime import datetime
-
-import asyncpg
-
-
 ALLOWED_RARITIES = (
     "common",
     "uncommon",
@@ -12,7 +7,17 @@ ALLOWED_RARITIES = (
 )
 
 
-async def item_exists(pool: asyncpg.Pool, name: str) -> bool:
+ALLOWED_GENRES = (
+    "heavy metal",
+    "thrash metal",
+    "death metal",
+    "black metal",
+    "doom metal",
+    "power metal",
+    "progressive metal",
+)
+
+async def item_exists(pool, name: str) -> bool:
     exists = await pool.fetchval(
         'SELECT 1 FROM "item" WHERE lower(name) = lower($1)',
         name,
@@ -21,19 +26,47 @@ async def item_exists(pool: asyncpg.Pool, name: str) -> bool:
 
 
 async def insert_item(
-    pool: asyncpg.Pool,
-    name: str,
-    description: str | None,
-    price: int,
-    rarity: str,
-) -> None:
+    pool,
+    name,
+    description,
+    price,
+    rarity,
+    is_stackable,
+    genre,
+    proficiency_bonus,
+):
     await pool.execute(
         """
-        INSERT INTO "item" (name, description, price, rarity)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO item
+        (
+            name,
+            description,
+            price,
+            rarity,
+            is_stackable,
+            genre,
+            proficiency_bonus
+        )
+        VALUES
+        ($1,$2,$3,$4,$5,$6,$7)
         """,
         name,
         description,
         price,
         rarity,
+        is_stackable,
+        genre,
+        proficiency_bonus,
     )
+
+
+async def remove_item(pool, name):
+    result = await pool.execute(
+        """
+        DELETE FROM item
+        WHERE lower(name)=lower($1)
+        """,
+        name,
+    )
+
+    return result != "DELETE 0"

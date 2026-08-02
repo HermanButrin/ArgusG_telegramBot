@@ -1,6 +1,9 @@
+from typing import Final
 from aiogram import types
 
 from aiogram_bot_template.db.user import ban_user_by_username
+
+BAN_ARGUMENTS_COUNT: Final = 2
 
 
 async def ban(msg: types.Message, **kwargs: object) -> None:
@@ -12,7 +15,7 @@ async def ban(msg: types.Message, **kwargs: object) -> None:
         return
 
     parts = msg.text.split(maxsplit=1)
-    if len(parts) < 2:
+    if len(parts) != BAN_ARGUMENTS_COUNT:
         await msg.answer("Используйте формат: /ban @username")
         return
 

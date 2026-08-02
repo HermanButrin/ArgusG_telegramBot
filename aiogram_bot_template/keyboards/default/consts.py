@@ -46,7 +46,7 @@ class DefaultConstructor:
     max_possible_properties = len(required_properties) + max_additional_properties
 
     @staticmethod
-    def _create_kb(  # noqa: PLR0913, C901
+    def _create_kb(  # noqa: PLR0913
         actions: Sequence[POSSIBLE_INPUT_ACTIONS_TYPES],
         schema: Sequence[int],
         *,

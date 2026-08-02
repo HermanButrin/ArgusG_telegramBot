@@ -124,10 +124,10 @@ async def aiohttp_on_startup(app: web.Application) -> None:
 
 async def aiohttp_on_shutdown(app: web.Application) -> None:
     dp: Dispatcher = app["dp"]
-    for i in [app, *app._subapps]:  # ruff: ignore[private-member-access] # dirty
+    for i in [app, *app._subapps]:  # noqa: SLF001 # dirty
         if "scheduler" in i:
             scheduler: aiojobs.Scheduler = i["scheduler"]
-            scheduler._closed = True  # ruff: ignore[private-member-access]
+            scheduler._closed = True  # noqa: SLF001
             while scheduler.pending_count != 0:
                 dp["aiogram_logger"].info(
                     f"Waiting for {scheduler.pending_count} tasks to complete",
@@ -179,7 +179,7 @@ async def aiogram_on_shutdown_polling(dispatcher: Dispatcher, bot: Bot) -> None:
     dispatcher["aiogram_logger"].info("Stopped polling")
 
 
-async def setup_aiohttp_app(  # ruff: ignore[unused-async]
+async def setup_aiohttp_app(
     bot: Bot,
     dp: Dispatcher,
 ) -> web.Application:

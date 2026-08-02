@@ -86,8 +86,6 @@ def rename_systemd_unit(
         old_systemd_unit.rename(new_systemd_unit)
 
 
-
-
 def rename_infra_files(
     *,
     project_dir: pathlib.Path,
@@ -112,7 +110,7 @@ def rename_app_in_py_normal(
         default_option=True,
     ):
         subprocess.call(
-            [  # noqa: S603, S607
+            [  # noqa: S607
                 "find",
                 project_dir / new_app_name,
                 "-type",
@@ -142,7 +140,7 @@ def rename_app_in_py_capitalized(
         default_option=True,
     ):
         subprocess.call(
-            [  # noqa: S603, S607
+            [  # noqa: S607
                 "find",
                 project_dir / new_app_name,
                 "-type",
@@ -172,7 +170,7 @@ def rename_app_in_py_capitalized_split_words(
         default_option=True,
     ):
         subprocess.call(
-            [  # noqa: S603, S607
+            [  # noqa: S607
                 "find",
                 project_dir / new_app_name,
                 "-type",
@@ -273,7 +271,7 @@ def rename_app_in_cicd(
         default_option=True,
     ):
         subprocess.call(
-            [  # noqa: S603, S607
+            [  # noqa: S607
                 "find",
                 project_dir / ".github" / "workflows",
                 "-type",
@@ -301,7 +299,7 @@ def rename_app_in_makefile(
         default_option=True,
     ):
         subprocess.call(
-            [  # noqa: S603, S607
+            [  # noqa: S607
                 "find",
                 project_dir,
                 "-type",

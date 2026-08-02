@@ -69,6 +69,7 @@ async def item(msg: types.Message, **kwargs: object) -> None:
         "/item remove",
     )
 
+
 # --- Добавление предмета ---
 
 # ruff: noqa: PLR0911

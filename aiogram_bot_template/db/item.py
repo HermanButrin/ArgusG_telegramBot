@@ -27,6 +27,7 @@ async def item_exists(pool: Pool, name: str) -> bool:
     )
     return bool(exists)
 
+
 # ruff: noqa: PLR0913, PLR0917, FBT001
 async def insert_item(
     pool: Pool,

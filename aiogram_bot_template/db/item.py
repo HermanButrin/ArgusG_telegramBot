@@ -1,3 +1,5 @@
+from asyncpg import Pool
+
 ALLOWED_RARITIES = (
     "common",
     "uncommon",
@@ -27,15 +29,15 @@ async def item_exists(pool, name: str) -> bool:
 
 
 async def insert_item(
-    pool,
-    name,
-    description,
-    price,
-    rarity,
-    is_stackable,
-    genre,
-    proficiency_bonus,
-):
+    pool: Pool,
+    name: str,
+    description: str,
+    price: int,
+    rarity: str,
+    is_stackable: bool,
+    genre: str,
+    proficiency_bonus: int,
+) -> None:
     await pool.execute(
         """
         INSERT INTO item
@@ -61,7 +63,7 @@ async def insert_item(
     )
 
 
-async def remove_item(pool, name):
+async def remove_item(pool: Pool, name: str) -> bool:
     result = await pool.execute(
         """
         DELETE FROM item

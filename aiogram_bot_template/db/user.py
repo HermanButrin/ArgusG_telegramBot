@@ -1,5 +1,4 @@
 import asyncpg
-from asyncpg import pool
 
 
 async def ensure_user_exists(pool: asyncpg.Pool, telegram_id: int) -> None:

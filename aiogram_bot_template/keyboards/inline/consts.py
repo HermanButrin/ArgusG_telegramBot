@@ -47,7 +47,7 @@ class InlineConstructor:
     max_possible_properties = len(required_properties) + max_additional_properties
 
     @staticmethod
-    def _create_kb(  # noqa: C901
+    def _create_kb(  # ruff: ignore[complex-structure]
         actions: list[POSSIBLE_INPUT_ACTIONS_TYPES],
         schema: list[int],
     ) -> InlineKeyboardMarkup:

@@ -1,10 +1,10 @@
-import subprocess  # noqa: S404
+import subprocess  # ruff: ignore[suspicious-subprocess-import]
 from urllib import parse
 
 from environs import Env
 
 VERSION = (
-    subprocess.check_output(["git", "describe", "--always"])  # noqa: S607
+    subprocess.check_output(["git", "describe", "--always"])  # ruff: ignore[start-process-with-partial-path]
     .strip()
     .decode()
 )

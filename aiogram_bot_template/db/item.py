@@ -17,6 +17,7 @@ ALLOWED_GENRES = (
     "progressive metal",
 )
 
+
 async def item_exists(pool, name: str) -> bool:
     exists = await pool.fetchval(
         'SELECT 1 FROM "item" WHERE lower(name) = lower($1)',

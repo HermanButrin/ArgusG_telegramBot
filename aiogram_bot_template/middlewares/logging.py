@@ -20,7 +20,7 @@ class UpdateLoggingContextManager:
         self.event = event
         self.logger = logger.bind(update_id=self.event.update_id)
 
-    def _fill_logger(self) -> None:  # noqa: PLR0915,PLR0912,C901
+    def _fill_logger(self) -> None:  # ruff: ignore[too-many-statements, too-many-branches, complex-structure]
         if self.event.callback_query:
             c = self.event.callback_query
             self.logger = self.logger.bind(
@@ -240,7 +240,7 @@ class StructLoggingMiddleware(BaseMiddleware):
             handler_result = await handler(event, data)
         return handler_result
 
-    def _bind_loggers(  # noqa: PLR6301
+    def _bind_loggers(  # ruff: ignore[no-self-use]
         self,
         event: Update,
         data: dict[str, Any],

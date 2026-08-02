@@ -76,7 +76,7 @@ async def add(msg: types.Message, **kwargs: object) -> None:
             "• uncommon\n"
             "• rare\n"
             "• epic\n"
-            "• legendary"
+            "• legendary",
         )
         return
 
@@ -99,5 +99,5 @@ async def add(msg: types.Message, **kwargs: object) -> None:
         f"📦 Название: {name}\n"
         f"📝 Описание: {description_text}\n"
         f"💰 Цена: {price}\n"
-        f"⭐ Редкость: {rarity_capitalized}"
+        f"⭐ Редкость: {rarity_capitalized}",
     )

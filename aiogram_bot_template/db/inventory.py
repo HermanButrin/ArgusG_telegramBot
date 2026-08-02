@@ -53,7 +53,7 @@ async def remove_item_from_inventory(
         """
         DELETE FROM "useritem"
         WHERE quantity <= 0
-        """
+        """,
     )
 
 

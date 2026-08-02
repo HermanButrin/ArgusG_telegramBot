@@ -46,7 +46,7 @@ class DefaultConstructor:
     max_possible_properties = len(required_properties) + max_additional_properties
 
     @staticmethod
-    def _create_kb(  # noqa: PLR0913
+    def _create_kb(  # ruff: ignore[too-many-arguments]
         actions: Sequence[POSSIBLE_INPUT_ACTIONS_TYPES],
         schema: Sequence[int],
         *,
@@ -90,7 +90,7 @@ class DefaultConstructor:
                         required_args=DefaultConstructor.required_properties,
                     )
             else:
-                raise TypeError("unknown action type")  # noqa: TRY003, EM101
+                raise TypeError("unknown action type")  # ruff: ignore[raise-vanilla-args, raw-string-in-exception]
             btns.append(KeyboardButton(**data))  # type:ignore[arg-type]
         kb = ReplyKeyboardMarkup(
             resize_keyboard=resize_keyboard,

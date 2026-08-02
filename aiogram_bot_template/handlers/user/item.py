@@ -27,6 +27,7 @@ def parse_item_command(text: str) -> list[str] | None:
 
     return parts[1:]
 
+
 async def item(msg: types.Message, **kwargs: object) -> None:
     if msg.from_user is None or not msg.text:
         return
@@ -42,35 +43,32 @@ async def item(msg: types.Message, **kwargs: object) -> None:
             "/item add — добавить предмет\n"
             "/item remove — удалить предмет\n\n"
             "Пример:\n"
-            "/item add \"Flying V\" \"Черная гитара\" 500 epic "
-            "\"Heavy Metal\" false 5"
+            '/item add "Flying V" "Черная гитара" 500 epic '
+            '"Heavy Metal" false 5',
         )
         return
 
-
     action = args[0].lower()
-
 
     if action == "add":
         await item_add(msg, args[1:], kwargs)
         return
 
-
     if action == "remove":
         await item_remove(msg, args[1:], kwargs)
         return
-
 
     await msg.answer(
         "❌ Неизвестная команда.\n"
         "Используй:\n"
         "/item\n"
         "/item add\n"
-        "/item remove"
+        "/item remove",
     )
-    
-# --- Добавление предмета ---    
-    
+
+# --- Добавление предмета ---
+
+
 async def item_add(
     msg: types.Message,
     args: list[str],
@@ -80,10 +78,9 @@ async def item_add(
     if len(args) != 7:
         await msg.answer(
             "❌ Формат:\n"
-            "/item add название описание цена редкость жанр stackable bonus"
+            "/item add название описание цена редкость жанр stackable bonus",
         )
         return
-
 
     name, description, price_text, rarity, genre, stackable_text, bonus_text = (
         args[0],
@@ -95,47 +92,39 @@ async def item_add(
         args[6],
     )
 
-
     if not price_text.isdigit():
         await msg.answer("❌ Цена должна быть числом.")
         return
 
-
     price = int(price_text)
-
 
     if rarity not in ALLOWED_RARITIES_SET:
         await msg.answer(
-            "❌ Неверная редкость."
+            "❌ Неверная редкость.",
         )
         return
-
 
     if genre not in ALLOWED_GENRES_SET:
         await msg.answer(
             "❌ Неверный жанр.\n"
-            + "\n".join(ALLOWED_GENRES)
+            + "\n".join(ALLOWED_GENRES),
         )
         return
-
 
     if stackable_text not in ("true", "false"):
         await msg.answer(
-            "❌ stackable должен быть true или false"
+            "❌ stackable должен быть true или false",
         )
         return
-
 
     if not bonus_text.isdigit():
         await msg.answer(
-            "❌ proficiency_bonus должен быть числом"
+            "❌ proficiency_bonus должен быть числом",
         )
         return
 
-
     proficiency_bonus = int(bonus_text)
     is_stackable = stackable_text == "true"
-
 
     pool = kwargs.get("db_pool")
 
@@ -143,13 +132,11 @@ async def item_add(
         await msg.answer("❌ Ошибка базы данных.")
         return
 
-
     if await item_exists(pool, name):
         await msg.answer(
-            "❌ Такой предмет уже существует."
+            "❌ Такой предмет уже существует.",
         )
         return
-
 
     await insert_item(
         pool,
@@ -162,7 +149,6 @@ async def item_add(
         proficiency_bonus,
     )
 
-
     await msg.answer(
         "✅ Предмет создан!\n\n"
         f"📦 {name}\n"
@@ -170,11 +156,12 @@ async def item_add(
         f"⭐ {rarity}\n"
         f"🎸 Жанр: {genre}\n"
         f"⚔ Бонус: +{proficiency_bonus}\n"
-        f"📚 Stackable: {is_stackable}"
+        f"📚 Stackable: {is_stackable}",
     )
-    
+
 # --- Удаление предмета ---
-    
+
+
 async def item_remove(
     msg: types.Message,
     args: list[str],
@@ -184,10 +171,9 @@ async def item_remove(
     if len(args) != 1:
         await msg.answer(
             "❌ Использование:\n"
-            "/item remove название"
+            "/item remove название",
         )
         return
-
 
     pool = kwargs.get("db_pool")
 
@@ -195,20 +181,17 @@ async def item_remove(
         await msg.answer("❌ Ошибка базы данных.")
         return
 
-
     deleted = await remove_item(
         pool,
         args[0],
     )
 
-
     if not deleted:
         await msg.answer(
-            "❌ Предмет не найден."
+            "❌ Предмет не найден.",
         )
         return
 
-
     await msg.answer(
-        f"🗑 Предмет {args[0]} удалён."
+        f"🗑 Предмет {args[0]} удалён.",
     )

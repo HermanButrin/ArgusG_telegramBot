@@ -105,7 +105,7 @@ class BasicButtons(DefaultConstructor):
         return BasicButtons._create_kb(btns, schema)
 
     @staticmethod
-    def ask_for_users(  # noqa: PLR0913
+    def ask_for_users(  # ruff: ignore[too-many-arguments]
         text: str,
         *,
         request_id: int = 1,

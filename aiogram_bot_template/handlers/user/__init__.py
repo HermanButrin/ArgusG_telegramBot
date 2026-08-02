@@ -20,7 +20,7 @@ def prepare_router() -> Router:
     user_router.message.register(promote.promote, Command("promote"), AdminFilter())
     user_router.message.register(
         start.start,
-        TextFilter("🏠В главное меню"),  # noqa: RUF001
+        TextFilter("🏠В главное меню"),  # ruff: ignore[ambiguous-unicode-character-string]
         StateFilter(states.user.UserMainMenu.menu),
     )
 

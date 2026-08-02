@@ -15,6 +15,9 @@ from aiogram_bot_template.db.item import (
 ALLOWED_RARITIES_SET: Final[set[str]] = set(ALLOWED_RARITIES)
 ALLOWED_GENRES_SET: Final[set[str]] = set(ALLOWED_GENRES)
 
+ITEM_ADD_ARGUMENTS_COUNT: Final = 7
+ITEM_REMOVE_ARGUMENTS_COUNT: Final = 1
+
 
 def parse_item_command(text: str) -> list[str] | None:
     try:
@@ -68,14 +71,14 @@ async def item(msg: types.Message, **kwargs: object) -> None:
 
 # --- Добавление предмета ---
 
-
+# ruff: noqa: PLR0911
 async def item_add(
     msg: types.Message,
     args: list[str],
     kwargs: dict,
 ) -> None:
 
-    if len(args) != 7:
+    if len(args) != ITEM_ADD_ARGUMENTS_COUNT:
         await msg.answer(
             "❌ Формат:\n"
             "/item add название описание цена редкость жанр stackable bonus",
@@ -111,7 +114,7 @@ async def item_add(
         )
         return
 
-    if stackable_text not in ("true", "false"):
+    if stackable_text not in {"true", "false"}:
         await msg.answer(
             "❌ stackable должен быть true или false",
         )
@@ -168,7 +171,7 @@ async def item_remove(
     kwargs: dict,
 ) -> None:
 
-    if len(args) != 1:
+    if len(args) != ITEM_REMOVE_ARGUMENTS_COUNT:
         await msg.answer(
             "❌ Использование:\n"
             "/item remove название",

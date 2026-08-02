@@ -49,10 +49,10 @@ async def profile(msg: types.Message, **kwargs: object) -> None:
             [
                 f"Имя: {html.quote(full_name)}",
                 f"Тег: @{html.quote(tag)}" if tag != "—" else f"Тег: {tag}",
-                f"Coins: {user_row.get('coins')}",
-                f"Created at: {created_at}",
-                f"Updated at: {updated_at}",
-                f"Last active at: {last_active_at}",
+                f"Баланс: {user_row.get('coins')}",
+                f"Аккаунт создан: {created_at}",
+                f"Обновлен: {updated_at}",
+                f"Последняя активность: {last_active_at}",
             ],
         ),
     )

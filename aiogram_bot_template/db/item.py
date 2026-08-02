@@ -20,7 +20,7 @@ ALLOWED_GENRES = (
 )
 
 
-async def item_exists(pool, name: str) -> bool:
+async def item_exists(pool: Pool, name: str) -> bool:
     exists = await pool.fetchval(
         'SELECT 1 FROM "item" WHERE lower(name) = lower($1)',
         name,
@@ -28,7 +28,7 @@ async def item_exists(pool, name: str) -> bool:
     return bool(exists)
 
 
-async def insert_item(
+async def insert_item( # ruff: noqa: PLR0913, PLR0917, FBT001
     pool: Pool,
     name: str,
     description: str,

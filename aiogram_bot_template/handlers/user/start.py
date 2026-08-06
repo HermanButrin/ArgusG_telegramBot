@@ -1,11 +1,11 @@
 from aiogram import html, types
-from aiogram.fsm.context import FSMContext
 
-from aiogram_bot_template import states
 from aiogram_bot_template.db.user import upsert_user
+from aiogram_bot_template.keyboards.inline.user.start_menu import create_start_menu
+from aiogram.types import CallbackQuery
 
 
-async def start(msg: types.Message, state: FSMContext, **kwargs: object) -> None:
+async def menu(msg: types.Message, **kwargs: object) -> None:
     if msg.from_user is None:
         return
 
@@ -21,8 +21,21 @@ async def start(msg: types.Message, state: FSMContext, **kwargs: object) -> None
         msg.from_user.username,
     )
 
-    m = [
-        f'Hello, <a href="tg://user?id={msg.from_user.id}">{html.quote(msg.from_user.full_name)}</a>',
-    ]
-    await msg.answer("\n".join(m))
-    await state.set_state(states.user.UserMainMenu.menu)
+    await msg.answer(
+        f"Привет, <a href='tg://user?id={msg.from_user.id}'>{html.quote(msg.from_user.full_name)}</a>!\n"
+        "Выберите действие в меню ниже:",
+        reply_markup=create_start_menu(),
+    )
+
+
+async def menu_callback(callback: CallbackQuery) -> None:
+    if callback.message is None:
+        await callback.answer()
+        return
+
+    await callback.message.edit_text(
+            f"Привет, <a href='tg://user?id={callback.from_user.id}'>{html.quote(callback.from_user.full_name)}</a>!\n"
+            "Выберите действие в меню ниже:",
+            reply_markup=create_start_menu(),
+        )
+    await callback.answer()

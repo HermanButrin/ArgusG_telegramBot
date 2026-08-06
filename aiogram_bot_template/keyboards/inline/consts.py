@@ -91,3 +91,19 @@ class InlineConstructor:
             inline_keyboard=schema_generator.create_keyboard_layout(btns, schema),
         )
         return kb
+
+    @staticmethod
+    def create_keyboard(
+        actions: list[POSSIBLE_INPUT_ACTIONS_TYPES],
+        schema: list[int],
+    ) -> InlineKeyboardMarkup:
+        """Public wrapper for creating inline keyboards.
+
+        Prefer this over accessing the private `_create_kb` helper.
+
+        Returns
+        -------
+        InlineKeyboardMarkup
+            Constructed inline keyboard markup.
+        """
+        return InlineConstructor._create_kb(actions, schema)

@@ -119,6 +119,19 @@ async def ban_user_by_username(pool: asyncpg.Pool, username: str) -> bool:
     return updated_user is not None
 
 
+async def unban_user_by_username(pool: asyncpg.Pool, username: str) -> bool:
+    updated_user = await pool.fetchrow(
+        """
+        UPDATE "user"
+        SET is_banned = FALSE
+        WHERE username = $1
+        RETURNING telegram_id
+        """,
+        username,
+    )
+    return updated_user is not None
+
+
 async def award_user_coins(
     pool: asyncpg.Pool,
     telegram_id: int,

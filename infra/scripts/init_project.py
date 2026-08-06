@@ -21,7 +21,7 @@ def capitalize_app_name(app_name: str) -> list[str]:
     return [x.capitalize() for x in words]
 
 
-def get_confirmation(question: str, default_option: bool | None) -> bool:
+def get_confirmation(question: str, *, default_option: bool | None) -> bool:
     input_prompt = "{question} (Y/y/N/n){default_option_possible}: ".format(
         question=question,
         default_option_possible=(
@@ -109,7 +109,7 @@ def rename_app_in_py_normal(
         f"replace all [{old_app_name}] with [{new_app_name}] in .py files?",
         default_option=True,
     ):
-        subprocess.call(
+        subprocess.call(  # noqa: S603
             [  # noqa: S607
                 "find",
                 project_dir / new_app_name,
@@ -139,7 +139,7 @@ def rename_app_in_py_capitalized(
         f"replace all [{capitilized_old_app_name}] with [{capitilized_new_app_name}] in .py files?",
         default_option=True,
     ):
-        subprocess.call(
+        subprocess.call(  # noqa: S603
             [  # noqa: S607
                 "find",
                 project_dir / new_app_name,
@@ -169,7 +169,7 @@ def rename_app_in_py_capitalized_split_words(
         f"replace all [{capitilized_old_app_name_split_words}] with [{capitilized_new_app_name_split_words}] in .py files?",
         default_option=True,
     ):
-        subprocess.call(
+        subprocess.call(  # noqa: S603
             [  # noqa: S607
                 "find",
                 project_dir / new_app_name,
@@ -270,7 +270,7 @@ def rename_app_in_cicd(
         f"replace all [{old_app_name}] with [{new_app_name}] in ./github/workflows/.yml files?",
         default_option=True,
     ):
-        subprocess.call(
+        subprocess.call(  # noqa: S603
             [  # noqa: S607
                 "find",
                 project_dir / ".github" / "workflows",
@@ -298,7 +298,7 @@ def rename_app_in_makefile(
         f"replace all [{old_app_name}] with [{new_app_name}] in Makefile?",
         default_option=True,
     ):
-        subprocess.call(
+        subprocess.call(  # noqa: S603
             [  # noqa: S607
                 "find",
                 project_dir,

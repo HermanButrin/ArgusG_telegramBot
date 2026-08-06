@@ -1,4 +1,4 @@
-import random
+import secrets
 from datetime import datetime, timezone
 
 from aiogram import types
@@ -10,7 +10,7 @@ async def coin(msg: types.Message, **kwargs: object) -> None:
     if msg.from_user is None:
         return
 
-    amount = random.randint(5, 10)
+    amount = secrets.randbelow(6) + 5
     db_pool = kwargs.get("db_pool")
     if db_pool is None:
         return

@@ -1,6 +1,9 @@
+from typing import Final
 from aiogram import types
 
 from aiogram_bot_template.db.user import promote_user_by_username
+
+ARGUMENTS_COUNT: Final = 2
 
 
 async def promote(msg: types.Message, **kwargs: object) -> None:
@@ -12,7 +15,7 @@ async def promote(msg: types.Message, **kwargs: object) -> None:
         return
 
     parts = msg.text.split(maxsplit=1)
-    if len(parts) < 2:
+    if len(parts) != ARGUMENTS_COUNT:
         await msg.answer("Используйте формат: /promote @username")
         return
 

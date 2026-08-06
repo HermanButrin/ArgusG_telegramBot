@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from aiogram import html, types
 
@@ -10,7 +10,7 @@ def _format_timestamp(value: datetime | None, timezone_name: str) -> str:
 
     try:
         user_tz = ZoneInfo(timezone_name)
-    except Exception:
+    except ZoneInfoNotFoundError:
         user_tz = timezone.utc
 
     if value.tzinfo is None:

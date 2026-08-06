@@ -179,7 +179,7 @@ async def aiogram_on_shutdown_polling(dispatcher: Dispatcher, bot: Bot) -> None:
     dispatcher["aiogram_logger"].info("Stopped polling")
 
 
-async def setup_aiohttp_app(
+async def setup_aiohttp_app(  # noqa: RUF029
     bot: Bot,
     dp: Dispatcher,
 ) -> web.Application:

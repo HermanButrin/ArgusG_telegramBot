@@ -2,7 +2,7 @@ import asyncpg
 import redis.asyncio as redis
 import structlog
 import tenacity
-from tenacity import _utils  # ruff: ignore[import-private-name]
+from tenacity import _utils  # noqa: PLC2701
 
 TIMEOUT_BETWEEN_ATTEMPTS = 2
 MAX_TIMEOUT = 30
@@ -69,7 +69,7 @@ async def wait_postgres(
     before_sleep=before_log,
     after=after_log,
 )
-async def wait_redis_pool(  # ruff: ignore[too-many-arguments]
+async def wait_redis_pool(  # noqa: PLR0913
     *,
     logger: structlog.typing.FilteringBoundLogger,
     host: str,

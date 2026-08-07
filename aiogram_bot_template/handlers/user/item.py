@@ -150,7 +150,7 @@ async def item_add(
         await msg.answer("❌ Ошибка базы данных.")
         return
 
-    if await item_exists(pool, type, brand, model):
+    if await item_exists(pool, instrument_type, brand, model):
         await msg.answer(
             "❌ Такой предмет уже существует.",
         )

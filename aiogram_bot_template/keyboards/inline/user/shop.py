@@ -1,3 +1,4 @@
+from asyncpg import Pool
 from aiogram.types import InlineKeyboardMarkup
 
 from aiogram_bot_template.db.item import (
@@ -23,7 +24,7 @@ def _keyboard_rows(actions: list[dict[str, object]], rows_per_line: int = 1) -> 
     return chunks
 
 
-async def create_shop_type_keyboard(pool) -> InlineKeyboardMarkup:
+async def create_shop_type_keyboard(pool: Pool) -> InlineKeyboardMarkup:
     instrument_types = await fetch_distinct_types(pool)
 
     actions = [
@@ -41,7 +42,7 @@ async def create_shop_type_keyboard(pool) -> InlineKeyboardMarkup:
     return InlineConstructor.create_keyboard(actions, _keyboard_rows(actions))
 
 
-async def create_shop_brand_keyboard(pool, instrument_type: str) -> InlineKeyboardMarkup:
+async def create_shop_brand_keyboard(pool: Pool, instrument_type: str) -> InlineKeyboardMarkup:
     brands = await fetch_distinct_brands_by_type(pool, instrument_type)
 
     actions = [
@@ -65,7 +66,7 @@ async def create_shop_brand_keyboard(pool, instrument_type: str) -> InlineKeyboa
     return InlineConstructor.create_keyboard(actions, _keyboard_rows(actions))
 
 
-async def create_shop_model_keyboard(pool, instrument_type: str, brand: str) -> InlineKeyboardMarkup:
+async def create_shop_model_keyboard(pool: Pool, instrument_type: str, brand: str) -> InlineKeyboardMarkup:
     models = await fetch_distinct_models_by_brand(pool, instrument_type, brand)
 
     actions = [

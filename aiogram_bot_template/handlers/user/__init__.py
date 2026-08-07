@@ -14,7 +14,6 @@ def prepare_router() -> Router:
     user_router.message.filter(BannedFilter())
 
     user_router.message.register(start.menu, CommandStart())
-    user_router.message.register(coin.coin, Command("coin"))
     user_router.message.register(item.item, Command("item"), AdminFilter())
     user_router.message.register(ban.ban, Command("ban"), AdminFilter())
     user_router.message.register(unban.unban, Command("unban"), AdminFilter())
@@ -28,6 +27,11 @@ def prepare_router() -> Router:
         start.menu_callback,
         Action.filter(),
         lambda _callback, callback_data: getattr(callback_data, "action", None) == "menu",
+    )
+    user_router.callback_query.register(
+        coin.coin,
+        Action.filter(),
+        lambda _callback, callback_data: getattr(callback_data, "action", None) == "coin",
     )
 
     return user_router

@@ -24,7 +24,7 @@ def _keyboard_rows(actions: list[dict[str, object]], rows_per_line: int = 1) -> 
     return chunks
 
 
-async def create_shop_type_keyboard(pool: Pool) -> InlineKeyboardMarkup:
+def create_shop_type_keyboard() -> InlineKeyboardMarkup:
     actions = [
         {
             "text": instrument_type.replace("_", " ").title(),

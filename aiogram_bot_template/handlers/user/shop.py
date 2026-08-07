@@ -42,7 +42,7 @@ async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kw
     if action == "shop_types":
         await callback.message.edit_text(
             "Выберите тип инструмента:",
-            reply_markup=await create_shop_type_keyboard(db_pool),
+            reply_markup=create_shop_type_keyboard(),
         )
     elif action == "shop_brands":
         if not instrument_type:

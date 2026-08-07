@@ -108,6 +108,44 @@ async def fetch_item_by_id(pool: Pool, item_id: int) -> dict | None:
     return dict(row) if row else None
 
 
+async def fetch_distinct_types(pool: Pool) -> list[str]:
+    rows = await pool.fetch(
+        """
+        SELECT DISTINCT type
+        FROM item
+        ORDER BY type
+        """,
+    )
+    return [row["type"] for row in rows]
+
+
+async def fetch_distinct_brands_by_type(pool: Pool, instrument_type: str) -> list[str]:
+    rows = await pool.fetch(
+        """
+        SELECT DISTINCT brand
+        FROM item
+        WHERE lower(type) = lower($1)
+        ORDER BY brand
+        """,
+        instrument_type,
+    )
+    return [row["brand"] for row in rows]
+
+
+async def fetch_distinct_models_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
+    rows = await pool.fetch(
+        """
+        SELECT DISTINCT model
+        FROM item
+        WHERE lower(type) = lower($1) AND lower(brand) = lower($2)
+        ORDER BY model
+        """,
+        instrument_type,
+        brand,
+    )
+    return [row["model"] for row in rows]
+
+
 async def fetch_all_items(pool: Pool) -> list[dict]:
     rows = await pool.fetch(
         """

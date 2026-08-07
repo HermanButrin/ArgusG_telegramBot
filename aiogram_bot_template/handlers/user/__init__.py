@@ -4,8 +4,8 @@ from aiogram.filters import Command, CommandStart
 from aiogram_bot_template import states as states
 from aiogram_bot_template.filters import AdminFilter, BannedFilter, ChatTypeFilter, TextFilter as TextFilter
 
-from . import item, unban, ban, coin, profile, start, promote
-from aiogram_bot_template.keyboards.inline.callbacks import Action
+from . import item, unban, ban, coin, profile, shop, start, promote
+from aiogram_bot_template.keyboards.inline.callbacks import Action, ShopAction
 
 
 def prepare_router() -> Router:
@@ -32,6 +32,15 @@ def prepare_router() -> Router:
         coin.coin,
         Action.filter(),
         lambda _callback, callback_data: getattr(callback_data, "action", None) == "coin",
+    )
+    user_router.callback_query.register(
+        shop.shop,
+        Action.filter(),
+        lambda _callback, callback_data: getattr(callback_data, "action", None) == "shop",
+    )
+    user_router.callback_query.register(
+        shop.shop_callback,
+        ShopAction.filter(),
     )
 
     return user_router

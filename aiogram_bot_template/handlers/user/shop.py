@@ -49,7 +49,7 @@ async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kw
             await callback.answer("Тип инструмента не найден.", show_alert=True)
             return
         await callback.message.edit_text(
-            f"Выберите бренд для {instrument_type.replace('_', ' ').title()}:",
+            "Выберите бренд:",
             reply_markup=await create_shop_brand_keyboard(db_pool, instrument_type),
         )
     elif action == "shop_models":
@@ -57,7 +57,7 @@ async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kw
             await callback.answer("Марка или тип инструмента не найдены.", show_alert=True)
             return
         await callback.message.edit_text(
-            f"Выберите модель для {brand} {instrument_type.replace('_', ' ').title()}:",
+            "Выберите модель:",
             reply_markup=await create_shop_model_keyboard(db_pool, instrument_type, brand),
         )
     else:

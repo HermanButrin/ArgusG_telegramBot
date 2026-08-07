@@ -1,8 +1,8 @@
 from aiogram import Router
-from aiogram.filters import Command, CommandStart, StateFilter
+from aiogram.filters import Command, CommandStart
 
-from aiogram_bot_template import states
-from aiogram_bot_template.filters import AdminFilter, BannedFilter, ChatTypeFilter, TextFilter
+from aiogram_bot_template import states as states
+from aiogram_bot_template.filters import AdminFilter, BannedFilter, ChatTypeFilter, TextFilter as TextFilter
 
 from . import item, unban, ban, coin, profile, start, promote
 from aiogram_bot_template.keyboards.inline.callbacks import Action

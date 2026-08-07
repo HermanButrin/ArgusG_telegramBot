@@ -6,17 +6,18 @@ from aiogram import types
 from aiogram_bot_template.db.item import (
     ALLOWED_GENRES,
     ALLOWED_RARITIES,
+    ALLOWED_TYPES,
     insert_item,
     item_exists,
     remove_item,
 )
 
-
 ALLOWED_RARITIES_SET: Final[set[str]] = set(ALLOWED_RARITIES)
 ALLOWED_GENRES_SET: Final[set[str]] = set(ALLOWED_GENRES)
+ALLOWED_TYPES_SET: Final[set[str]] = set(ALLOWED_TYPES)
 
-ITEM_ADD_ARGUMENTS_COUNT: Final = 7
-ITEM_REMOVE_ARGUMENTS_COUNT: Final = 1
+ITEM_ADD_ARGUMENTS_COUNT: Final = 9
+ITEM_REMOVE_ARGUMENTS_COUNT: Final = 3
 
 
 def parse_item_command(text: str) -> list[str] | None:
@@ -42,12 +43,22 @@ async def item(msg: types.Message, **kwargs: object) -> None:
 
     if not args:
         await msg.answer(
-            "📦 Использование команды:\n\n"
-            "/item add — добавить предмет\n"
-            "/item remove — удалить предмет\n\n"
-            "Пример:\n"
-            '/item add "Flying V" "Черная гитара" 500 epic '
-            '"Heavy Metal" false 5',
+            "📦 <b>Управление предметами</b>\n\n"
+            "<b>Доступные команды:</b>\n"
+            "• <code>/item add</code> — добавить предмет\n"
+            "• <code>/item remove</code> — удалить предмет\n\n"
+            "<b>Формат:</b>\n"
+            '<code>/item add "Тип" "Бренд" "Модель" '
+            '"Описание" Цена Редкость Жанр Stackable Бонус</code>\n\n'
+            "<b>Пример:</b>\n"
+            '<code>/item add "guitar" "Gibson" "Flying V" '
+            '"Черная электрогитара" 1000 epic "heavy metal" true 5</code>\n\n'
+            "<b>Допустимые значения:</b>\n"
+            f"🎸 <b>Тип:</b> {', '.join(ALLOWED_TYPES)}\n"
+            f"⭐ <b>Редкость:</b> {', '.join(ALLOWED_RARITIES)}\n"
+            f"🎵 <b>Жанр:</b>\n• " + "\n• ".join(ALLOWED_GENRES) + "\n\n"
+            "📚 <b>Stackable:</b> true / false\n"
+            "⚔ <b>Бонус:</b> целое число",
         )
         return
 
@@ -72,6 +83,7 @@ async def item(msg: types.Message, **kwargs: object) -> None:
 
 # --- Добавление предмета ---
 
+
 # ruff: noqa: PLR0911
 async def item_add(
     msg: types.Message,
@@ -81,19 +93,22 @@ async def item_add(
 
     if len(args) != ITEM_ADD_ARGUMENTS_COUNT:
         await msg.answer(
-            "❌ Формат:\n"
-            "/item add название описание цена редкость жанр stackable bonus",
+            "❌ <b>Формат:</b>\n"
+            '<code>/item add "Тип" "Бренд" "Модель" '
+            '"Описание" Цена Редкость Жанр Stackable Бонус</code>',
         )
         return
 
-    name, description, price_text, rarity, genre, stackable_text, bonus_text = (
-        args[0],
-        args[1],
-        args[2],
-        args[3].lower(),
-        args[4].lower(),
+    instrument_type, brand, model, description, price_text, rarity, genre, stackable_text, bonus_text = (
+        args[0].lower(),
+        args[1].lower(),
+        args[2].lower(),
+        args[3],
+        args[4],
         args[5].lower(),
-        args[6],
+        args[6].lower(),
+        args[7].lower(),
+        args[8],
     )
 
     if not price_text.isdigit():
@@ -110,8 +125,7 @@ async def item_add(
 
     if genre not in ALLOWED_GENRES_SET:
         await msg.answer(
-            "❌ Неверный жанр.\n"
-            + "\n".join(ALLOWED_GENRES),
+            "❌ Неверный жанр.\n" + "\n".join(ALLOWED_GENRES),
         )
         return
 
@@ -136,7 +150,7 @@ async def item_add(
         await msg.answer("❌ Ошибка базы данных.")
         return
 
-    if await item_exists(pool, name):
+    if await item_exists(pool, type, brand, model):
         await msg.answer(
             "❌ Такой предмет уже существует.",
         )
@@ -144,7 +158,9 @@ async def item_add(
 
     await insert_item(
         pool,
-        name,
+        instrument_type,
+        brand,
+        model,
         description,
         price,
         rarity,
@@ -154,14 +170,12 @@ async def item_add(
     )
 
     await msg.answer(
-        "✅ Предмет создан!\n\n"
-        f"📦 {name}\n"
-        f"💰 Цена: {price}\n"
-        f"⭐ {rarity}\n"
-        f"🎸 Жанр: {genre}\n"
-        f"⚔ Бонус: +{proficiency_bonus}\n"
-        f"📚 Stackable: {is_stackable}",
+        "✅ Предмет создан!\n"
+        f"🎸 {brand} {model} ({instrument_type})\n"
+        f"⭐ {rarity} • 🎵 {genre}\n"
+        f"💰 {price}$ • ⚔ +{proficiency_bonus}",
     )
+
 
 # --- Удаление предмета ---
 
@@ -174,10 +188,15 @@ async def item_remove(
 
     if len(args) != ITEM_REMOVE_ARGUMENTS_COUNT:
         await msg.answer(
-            "❌ Использование:\n"
-            "/item remove название",
+            "❌ Использование:\n/item remove тип бренд модель",
         )
         return
+
+    instrument_type, brand, model = (
+        args[0].lower(),
+        args[1].lower(),
+        args[2].lower(),
+    )
 
     pool = kwargs.get("db_pool")
 
@@ -187,7 +206,9 @@ async def item_remove(
 
     deleted = await remove_item(
         pool,
-        args[0],
+        instrument_type,
+        brand,
+        model,
     )
 
     if not deleted:
@@ -197,5 +218,5 @@ async def item_remove(
         return
 
     await msg.answer(
-        f"🗑 Предмет {args[0]} удалён.",
+        f"🗑 Предмет {brand} {model} удалён.",
     )

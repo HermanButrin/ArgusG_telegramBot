@@ -3,7 +3,6 @@ from aiogram.types import CallbackQuery
 import secrets
 from datetime import datetime, timezone
 
-from aiogram import types
 
 from aiogram_bot_template.db.user import award_user_coins
 

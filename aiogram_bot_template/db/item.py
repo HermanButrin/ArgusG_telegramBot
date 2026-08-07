@@ -20,10 +20,22 @@ ALLOWED_GENRES = (
 )
 
 
-async def item_exists(pool: Pool, name: str) -> bool:
+ALLOWED_TYPES = (
+    "guitar",
+    "bass",
+    "drums",
+    "keyboard",
+    "vocal",
+    "other",
+)
+
+
+async def item_exists(pool: Pool, instrument_type: str, brand: str, model: str) -> bool:
     exists = await pool.fetchval(
-        'SELECT 1 FROM "item" WHERE lower(name) = lower($1)',
-        name,
+        'SELECT 1 FROM "item" WHERE lower(type) = lower($1) AND lower(brand) = lower($2) AND lower(model) = lower($3)',
+        instrument_type,
+        brand,
+        model,
     )
     return bool(exists)
 
@@ -31,7 +43,9 @@ async def item_exists(pool: Pool, name: str) -> bool:
 # ruff: noqa: PLR0913, PLR0917, FBT001
 async def insert_item(
     pool: Pool,
-    name: str,
+    instrument_type: str,
+    brand: str,
+    model: str,
     description: str,
     price: int,
     rarity: str,
@@ -43,7 +57,9 @@ async def insert_item(
         """
         INSERT INTO item
         (
-            name,
+            type,
+            brand,
+            model,
             description,
             price,
             rarity,
@@ -52,9 +68,11 @@ async def insert_item(
             proficiency_bonus
         )
         VALUES
-        ($1,$2,$3,$4,$5,$6,$7)
+        ($1,$2,$3,$4,$5,$6,$7,$8,$9)
         """,
-        name,
+        instrument_type,
+        brand,
+        model,
         description,
         price,
         rarity,
@@ -64,13 +82,37 @@ async def insert_item(
     )
 
 
-async def remove_item(pool: Pool, name: str) -> bool:
+async def remove_item(pool: Pool, instrument_type: str, brand: str, model: str) -> bool:
     result = await pool.execute(
         """
         DELETE FROM item
-        WHERE lower(name)=lower($1)
+        WHERE lower(type)=lower($1) AND lower(brand)=lower($2) AND lower(model)=lower($3)
         """,
-        name,
+        instrument_type,
+        brand,
+        model,
     )
 
     return result != "DELETE 0"
+
+
+async def fetch_item_by_id(pool: Pool, item_id: int) -> dict | None:
+    row = await pool.fetchrow(
+        """
+        SELECT *
+        FROM item
+        WHERE id = $1
+        """,
+        item_id,
+    )
+    return dict(row) if row else None
+
+
+async def fetch_all_items(pool: Pool) -> list[dict]:
+    rows = await pool.fetch(
+        """
+        SELECT *
+        FROM item
+        """,
+    )
+    return [dict(row) for row in rows]

@@ -2,9 +2,9 @@ from asyncpg import Pool
 from aiogram.types import InlineKeyboardMarkup
 
 from aiogram_bot_template.db.item import (
+    ALLOWED_TYPES,
     get_distinct_brands_by_type,
     get_distinct_models_by_brand,
-    get_distinct_instrument_types,
 )
 from aiogram_bot_template.keyboards.inline.callbacks import Action, ShopAction
 from aiogram_bot_template.keyboards.inline.consts import InlineConstructor
@@ -25,8 +25,6 @@ def _keyboard_rows(actions: list[dict[str, object]], rows_per_line: int = 1) -> 
 
 
 async def create_shop_type_keyboard(pool: Pool) -> InlineKeyboardMarkup:
-    instrument_types = await get_distinct_instrument_types(pool)
-
     actions = [
         {
             "text": instrument_type.replace("_", " ").title(),
@@ -35,7 +33,7 @@ async def create_shop_type_keyboard(pool: Pool) -> InlineKeyboardMarkup:
                 instrument_type=instrument_type,
             ),
         }
-        for instrument_type in instrument_types
+        for instrument_type in ALLOWED_TYPES
     ]
     actions.append({"text": "◀️ Назад", "callback_data": Action(action="menu")})
 

@@ -57,7 +57,7 @@ async def remove_item_from_inventory(
     )
 
 
-async def fetch_useritem(
+async def get_useritem(
     pool: asyncpg.Pool,
     telegram_id: int,
 ) -> list[dict[str, object]]:
@@ -109,7 +109,7 @@ async def user_has_item(
     return row is not None
 
 
-async def fetch_item_quantity(
+async def get_item_quantity(
     pool: asyncpg.Pool,
     telegram_id: int,
     item_id: int,

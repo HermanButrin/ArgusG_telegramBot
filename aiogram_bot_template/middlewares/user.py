@@ -5,7 +5,7 @@ from typing import Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Update
 
-from aiogram_bot_template.db.user import fetch_user
+from aiogram_bot_template.db.user import get_user
 
 
 class UserProfileMiddleware(BaseMiddleware):
@@ -37,7 +37,7 @@ class UserProfileMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         with suppress(Exception):
-            user_row = await fetch_user(db_pool, user.id)
+            user_row = await get_user(db_pool, user.id)
             data["user"] = user_row
 
         return await handler(event, data)

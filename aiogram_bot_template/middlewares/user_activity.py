@@ -5,7 +5,7 @@ from typing import Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Update
 
-from aiogram_bot_template.db.user import ensure_user_exists, update_last_active
+from aiogram_bot_template.db.user import user_exists, update_last_active
 
 
 class UserActivityMiddleware(BaseMiddleware):
@@ -43,7 +43,7 @@ class UserActivityMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         with suppress(Exception):
-            await ensure_user_exists(db_pool, user.id)
+            await user_exists(db_pool, user.id)
             await update_last_active(db_pool, user.id)
 
         return await handler(event, data)

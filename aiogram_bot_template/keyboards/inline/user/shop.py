@@ -2,9 +2,9 @@ from asyncpg import Pool
 from aiogram.types import InlineKeyboardMarkup
 
 from aiogram_bot_template.db.item import (
-    fetch_distinct_brands_by_type,
-    fetch_distinct_models_by_brand,
-    fetch_distinct_types,
+    get_distinct_brands_by_type,
+    get_distinct_models_by_brand,
+    get_distinct_instrument_types,
 )
 from aiogram_bot_template.keyboards.inline.callbacks import Action, ShopAction
 from aiogram_bot_template.keyboards.inline.consts import InlineConstructor
@@ -25,7 +25,7 @@ def _keyboard_rows(actions: list[dict[str, object]], rows_per_line: int = 1) -> 
 
 
 async def create_shop_type_keyboard(pool: Pool) -> InlineKeyboardMarkup:
-    instrument_types = await fetch_distinct_types(pool)
+    instrument_types = await get_distinct_instrument_types(pool)
 
     actions = [
         {
@@ -43,7 +43,7 @@ async def create_shop_type_keyboard(pool: Pool) -> InlineKeyboardMarkup:
 
 
 async def create_shop_brand_keyboard(pool: Pool, instrument_type: str) -> InlineKeyboardMarkup:
-    brands = await fetch_distinct_brands_by_type(pool, instrument_type)
+    brands = await get_distinct_brands_by_type(pool, instrument_type)
 
     actions = [
         {
@@ -67,7 +67,7 @@ async def create_shop_brand_keyboard(pool: Pool, instrument_type: str) -> Inline
 
 
 async def create_shop_model_keyboard(pool: Pool, instrument_type: str, brand: str) -> InlineKeyboardMarkup:
-    models = await fetch_distinct_models_by_brand(pool, instrument_type, brand)
+    models = await get_distinct_models_by_brand(pool, instrument_type, brand)
 
     actions = [
         {

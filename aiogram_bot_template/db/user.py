@@ -1,7 +1,7 @@
 import asyncpg
 
 
-async def ensure_user_exists(pool: asyncpg.Pool, telegram_id: int) -> None:
+async def user_exists(pool: asyncpg.Pool, telegram_id: int) -> None:
     await pool.execute(
         """
         INSERT INTO "user" (telegram_id)
@@ -47,7 +47,7 @@ async def upsert_user(
     )
 
 
-async def fetch_user(
+async def get_user(
     pool: asyncpg.Pool,
     telegram_id: int,
 ) -> dict[str, object] | None:

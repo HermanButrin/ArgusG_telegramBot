@@ -91,13 +91,12 @@ async def insert_item(
     )
 
 
-async def remove_item(pool: Pool, instrument_type: str, brand: str, model: str) -> bool:
+async def remove_item(pool: Pool, brand: str, model: str) -> bool:
     result = await pool.execute(
         """
         DELETE FROM item
-        WHERE lower(type)=lower($1) AND lower(brand)=lower($2) AND lower(model)=lower($3)
+        WHERE lower(brand)=lower($1) AND lower(model)=lower($2)
         """,
-        instrument_type,
         brand,
         model,
     )

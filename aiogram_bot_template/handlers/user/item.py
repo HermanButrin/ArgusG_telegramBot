@@ -192,10 +192,9 @@ async def item_remove(
         )
         return
 
-    instrument_type, brand, model = (
+    brand, model = (
         args[0].lower(),
         args[1].lower(),
-        args[2].lower(),
     )
 
     pool = kwargs.get("db_pool")
@@ -206,7 +205,6 @@ async def item_remove(
 
     deleted = await remove_item(
         pool,
-        instrument_type,
         brand,
         model,
     )

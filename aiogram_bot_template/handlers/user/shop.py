@@ -1,9 +1,12 @@
+from aiogram import html
 from aiogram.types import CallbackQuery
 
+from aiogram_bot_template.db.item import get_item_by_type_brand_model
 from aiogram_bot_template.keyboards.inline.callbacks import ShopAction
 from aiogram_bot_template.keyboards.inline.user.shop import (
     create_shop_brand_keyboard,
     create_shop_model_keyboard,
+    create_shop_model_preview_keyboard,
     create_shop_type_keyboard,
 )
 
@@ -20,12 +23,12 @@ async def shop(callback: CallbackQuery, **kwargs: object) -> None:
 
     await callback.message.edit_text(
         "Выберите тип инструмента:",
-        reply_markup=await create_shop_type_keyboard(db_pool),
+        reply_markup=create_shop_type_keyboard(),
     )
     await callback.answer()
 
 
-async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kwargs: object) -> None:
+async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kwargs: object) -> None:  # noqa: C901, PLR0911
     if callback.message is None:
         await callback.answer()
         return
@@ -60,6 +63,44 @@ async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kw
             "Выберите модель:",
             reply_markup=await create_shop_model_keyboard(db_pool, instrument_type, brand),
         )
+    elif action == "shop_model_preview":
+        if not instrument_type or not brand or not callback_data.model:
+            await callback.answer("Модель не найдена.", show_alert=True)
+            return
+
+        item = await get_item_by_type_brand_model(db_pool, instrument_type, brand, callback_data.model)
+        if item is None:
+            await callback.answer("Модель не найдена в каталоге.", show_alert=True)
+            return
+
+        item_type = str(item.get("type")).title()
+        item_brand = str(item.get("brand")).title()
+        item_model = str(item.get("model")).title()
+        rarity = str(item.get("rarity")).title()
+        genre = str(item.get("genre", "")).replace("_", " ").title()
+        description = str(item.get("description")) or "Описание отсутствует."
+        price = item.get("price")
+        is_stackable = bool(item.get("is_stackable"))
+        bonus = item.get("proficiency_bonus")
+
+        text = (
+            f"<b>{item_brand} {item_model}</b>\n"
+            f"Тип: {item_type}\n"
+            f"Цена: {price} coins\n"
+            f"Редкость: {rarity}\n"
+            f"Жанр: {genre}\n"
+            f"Стакается: {'Да' if is_stackable else 'Нет'}\n"
+            f"Бонус мастерства: +{bonus}\n\n"
+            f"{html.quote(description)}"
+        )
+
+        await callback.message.edit_text(
+            text,
+            reply_markup=create_shop_model_preview_keyboard(instrument_type, brand, callback_data.model),
+        )
+    elif action == "shop_buy":
+        await callback.answer("Покупка пока не реализована.", show_alert=True)
+        return
     else:
         await callback.answer("Выберите раздел магазина.", show_alert=True)
         return

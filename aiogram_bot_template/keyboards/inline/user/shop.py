@@ -3,8 +3,9 @@ from aiogram.types import InlineKeyboardMarkup
 
 from aiogram_bot_template.db.item import (
     ALLOWED_TYPES,
+    ALLOWED_RARITIES,
     get_distinct_brands_by_type,
-    get_distinct_models_by_brand,
+    get_distinct_models_with_rarity_by_brand,
 )
 from aiogram_bot_template.keyboards.inline.callbacks import Action, ShopAction
 from aiogram_bot_template.keyboards.inline.consts import InlineConstructor
@@ -65,16 +66,16 @@ async def create_shop_brand_keyboard(pool: Pool, instrument_type: str) -> Inline
 
 
 async def create_shop_model_keyboard(pool: Pool, instrument_type: str, brand: str) -> InlineKeyboardMarkup:
-    models = await get_distinct_models_by_brand(pool, instrument_type, brand)
+    models = await get_distinct_models_with_rarity_by_brand(pool, instrument_type, brand)
 
     actions = [
         {
-            "text": model.title(),
+            "text": f"{ALLOWED_RARITIES.get(model['rarity'], '')} {model['model'].title()}",
             "callback_data": ShopAction(
                 action="shop_model_preview",
                 instrument_type=instrument_type,
                 brand=brand,
-                model=model,
+                model=model["model"],
             ),
         }
         for model in models
@@ -90,3 +91,32 @@ async def create_shop_model_keyboard(pool: Pool, instrument_type: str, brand: st
     )
 
     return InlineConstructor.create_keyboard(actions, _keyboard_rows(actions))
+
+
+def create_shop_model_preview_keyboard(
+    instrument_type: str,
+    brand: str,
+    model: str,
+) -> InlineKeyboardMarkup:
+    return InlineConstructor.create_keyboard(
+        [
+            {
+                "text": "💰 Купить",
+                "callback_data": ShopAction(
+                    action="shop_buy",
+                    instrument_type=instrument_type,
+                    brand=brand,
+                    model=model,
+                ),
+            },
+            {
+                "text": "◀️ Назад",
+                "callback_data": ShopAction(
+                    action="shop_models",
+                    instrument_type=instrument_type,
+                    brand=brand,
+                ),
+            },
+        ],
+        [1, 1],
+    )

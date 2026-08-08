@@ -1,12 +1,21 @@
 from asyncpg import Pool
 
-ALLOWED_RARITIES = (
-    "common",
-    "uncommon",
-    "rare",
-    "epic",
-    "legendary",
-)
+ALLOWED_RARITIES = {
+    "common": "",
+    "uncommon": "🟢",
+    "rare": "🔵",
+    "epic": "🟣",
+    "legendary": "🟡",
+}
+
+
+RARITY_ORDER = {
+    "common": 0,
+    "uncommon": 1,
+    "rare": 2,
+    "epic": 3,
+    "legendary": 4,
+}
 
 
 ALLOWED_GENRES = (
@@ -108,6 +117,27 @@ async def get_item_by_id(pool: Pool, item_id: int) -> dict | None:
     return dict(row) if row else None
 
 
+async def get_item_by_type_brand_model(
+    pool: Pool,
+    instrument_type: str,
+    brand: str,
+    model: str,
+) -> dict | None:
+    row = await pool.fetchrow(
+        """
+        SELECT *
+        FROM item
+        WHERE lower(type) = lower($1)
+          AND lower(brand) = lower($2)
+          AND lower(model) = lower($3)
+        """,
+        instrument_type,
+        brand,
+        model,
+    )
+    return dict(row) if row else None
+
+
 async def get_distinct_instrument_types(pool: Pool) -> list[str]:
     rows = await pool.fetch(
         """
@@ -144,6 +174,29 @@ async def get_distinct_models_by_brand(pool: Pool, instrument_type: str, brand: 
         brand,
     )
     return [row["model"] for row in rows]
+
+
+async def get_distinct_models_with_rarity_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
+    rows = await pool.fetch(
+        """
+        SELECT DISTINCT ON (lower(model))
+            model,
+            rarity
+        FROM item
+        WHERE lower(type) = lower($1)
+          AND lower(brand) = lower($2)
+        ORDER BY lower(model), rarity
+        """,
+        instrument_type,
+        brand,
+    )
+
+    models = [dict(row) for row in rows]
+
+    return sorted(
+        models,
+        key=lambda item: RARITY_ORDER[item["rarity"]],
+    )
 
 
 async def get_all_items(pool: Pool) -> list[dict]:

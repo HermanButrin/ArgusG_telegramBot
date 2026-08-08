@@ -151,3 +151,19 @@ async def give_user_coins(
         coins,
         coins_cooldown,
     )
+
+
+async def take_user_coins(
+    pool: asyncpg.Pool,
+    telegram_id: int,
+    coins: int,
+) -> None:
+    await pool.execute(
+        """
+        UPDATE "user"
+        SET coins = coins - $2
+        WHERE telegram_id = $1 AND coins >= $2
+        """,
+        telegram_id,
+        coins,
+    )

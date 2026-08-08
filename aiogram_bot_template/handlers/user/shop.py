@@ -1,7 +1,9 @@
 from aiogram import html
 from aiogram.types import CallbackQuery
 
+from aiogram_bot_template.db.user import get_user, take_user_coins
 from aiogram_bot_template.db.item import get_item_by_brand_model
+from aiogram_bot_template.db.inventory import add_item_to_inventory
 from aiogram_bot_template.keyboards.inline.callbacks import ShopAction
 from aiogram_bot_template.keyboards.inline.user.shop import (
     create_shop_brand_keyboard,
@@ -99,8 +101,26 @@ async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kw
             reply_markup=create_shop_model_preview_keyboard(instrument_type, brand, callback_data.model),
         )
     elif action == "shop_buy":
-        await callback.answer("Покупка пока не реализована.", show_alert=True)
-        return
+        if not instrument_type or not brand or not callback_data.model:
+            await callback.answer("Модель не найдена.", show_alert=True)
+            return
+
+        item = await get_item_by_brand_model(db_pool, brand, callback_data.model)
+        user = await get_user(db_pool, callback.from_user.id)
+        if user is None:
+            await callback.answer("Пользователь не найден.", show_alert=True)
+            return
+
+        if item is None:
+            await callback.answer("Модель не найдена в каталоге.", show_alert=True)
+            return
+
+        if int(user.get("coins")) < int(item.get("price")):
+            await callback.answer("У вас недостаточно монет для покупки этого предмета.", show_alert=True)
+            return
+        await take_user_coins(db_pool, callback.from_user.id, item["price"])
+        await add_item_to_inventory(db_pool, callback.from_user.id, item["id"])
+        await callback.answer(f"Вы успешно купили {item['brand']} {item['model']} за {item['price']} coins!", show_alert=True)
     else:
         await callback.answer("Выберите раздел магазина.", show_alert=True)
         return

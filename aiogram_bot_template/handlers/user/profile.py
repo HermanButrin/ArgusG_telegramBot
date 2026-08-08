@@ -29,7 +29,7 @@ async def profile(callback: CallbackQuery, **kwargs: object) -> None:
     if callback.message is None:
         await callback.answer()
         return
-    
+
     db_pool = kwargs.get("db_pool")
     if db_pool is None:
         await callback.answer("База данных недоступна.", show_alert=True)

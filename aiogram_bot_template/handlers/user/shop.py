@@ -19,25 +19,34 @@ async def shop(callback: CallbackQuery, **kwargs: object) -> None:
         return
 
     db_pool = kwargs.get("db_pool")
+
     if db_pool is None:
-        await callback.answer("База данных недоступна.", show_alert=True)
+        await callback.answer(
+            "База данных недоступна.",
+            show_alert=True,
+        )
         return
 
     await callback.message.edit_text(
         "Выберите тип инструмента:",
         reply_markup=create_shop_type_keyboard(),
     )
+
     await callback.answer()
 
 
-async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kwargs: object) -> None:  # noqa: C901, PLR0911
-    if callback.message is None:
-        await callback.answer()
-        return
-
+async def shop_callback(
+    callback: CallbackQuery,
+    callback_data: ShopAction,
+    **kwargs: object,
+) -> None:
     db_pool = kwargs.get("db_pool")
+
     if db_pool is None:
-        await callback.answer("База данных недоступна.", show_alert=True)
+        await callback.answer(
+            "База данных недоступна.",
+            show_alert=True,
+        )
         return
 
     action = callback_data.action
@@ -45,84 +54,218 @@ async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kw
     brand = callback_data.brand or ""
 
     if action == "shop_types":
-        await callback.message.edit_text(
-            "Выберите тип инструмента:",
-            reply_markup=create_shop_type_keyboard(),
-        )
+        result = await shop_types(callback)
+
     elif action == "shop_brands":
-        if not instrument_type:
-            await callback.answer("Тип инструмента не найден.", show_alert=True)
-            return
-        await callback.message.edit_text(
-            "Выберите бренд:",
-            reply_markup=await create_shop_brand_keyboard(db_pool, instrument_type),
+        result = await shop_brands(
+            callback,
+            instrument_type,
+            db_pool,
         )
+
     elif action == "shop_models":
-        if not instrument_type or not brand:
-            await callback.answer("Марка или тип инструмента не найдены.", show_alert=True)
-            return
-        await callback.message.edit_text(
-            "Выберите модель:",
-            reply_markup=await create_shop_model_keyboard(db_pool, instrument_type, brand),
+        result = await shop_models(
+            callback,
+            instrument_type,
+            brand,
+            db_pool,
         )
+
     elif action == "shop_model_preview":
-        if not instrument_type or not brand or not callback_data.model:
-            await callback.answer("Модель не найдена.", show_alert=True)
-            return
-
-        item = await get_item_by_brand_model(db_pool, brand, callback_data.model)
-        if item is None:
-            await callback.answer("Модель не найдена в каталоге.", show_alert=True)
-            return
-
-        item_type = str(item.get("type")).title()
-        item_brand = str(item.get("brand")).title()
-        item_model = str(item.get("model")).title()
-        rarity = str(item.get("rarity")).title()
-        genre = str(item.get("genre", "")).replace("_", " ").title()
-        description = str(item.get("description")) or "Описание отсутствует."
-        price = item.get("price")
-        is_stackable = bool(item.get("is_stackable"))
-        bonus = item.get("proficiency_bonus")
-
-        text = (
-            f"<b>{item_brand} {item_model}</b>\n"
-            f"Тип: {item_type}\n"
-            f"Цена: {price} coins\n"
-            f"Редкость: {rarity}\n"
-            f"Жанр: {genre}\n"
-            f"Стакается: {'Да' if is_stackable else 'Нет'}\n"
-            f"Бонус мастерства: +{bonus}\n\n"
-            f"{html.quote(description)}"
+        result = await shop_model_preview(
+            callback,
+            callback_data,
+            instrument_type,
+            brand,
+            db_pool,
         )
 
-        await callback.message.edit_text(
-            text,
-            reply_markup=create_shop_model_preview_keyboard(instrument_type, brand, callback_data.model),
-        )
     elif action == "shop_buy":
-        if not instrument_type or not brand or not callback_data.model:
-            await callback.answer("Модель не найдена.", show_alert=True)
-            return
+        result = await shop_buy(
+            callback,
+            callback_data,
+            instrument_type,
+            brand,
+            db_pool,
+        )
 
-        item = await get_item_by_brand_model(db_pool, brand, callback_data.model)
-        user = await get_user(db_pool, callback.from_user.id)
-        if user is None:
-            await callback.answer("Пользователь не найден.", show_alert=True)
-            return
-
-        if item is None:
-            await callback.answer("Модель не найдена в каталоге.", show_alert=True)
-            return
-
-        if int(user.get("coins")) < int(item.get("price")):
-            await callback.answer("У вас недостаточно монет для покупки этого предмета.", show_alert=True)
-            return
-        await take_user_coins(db_pool, callback.from_user.id, item["price"])
-        await add_item_to_inventory(db_pool, callback.from_user.id, item["id"])
-        await callback.answer(f"Вы успешно купили {item['brand']} {item['model']} за {item['price']} coins!", show_alert=True)
     else:
-        await callback.answer("Выберите раздел магазина.", show_alert=True)
+        result = "Выберите раздел магазина."
+
+    if result is not None:
+        await callback.answer(
+            result,
+            show_alert=True,
+        )
         return
 
     await callback.answer()
+
+
+async def shop_types(callback: CallbackQuery) -> str | None:
+    if callback.message is None:
+        return None
+
+    await callback.message.edit_text(
+        "Выберите тип инструмента:",
+        reply_markup=create_shop_type_keyboard(),
+    )
+
+    return None
+
+
+async def shop_brands(
+    callback: CallbackQuery,
+    instrument_type: str,
+    db_pool: object,
+) -> str | None:
+    if callback.message is None:
+        return None
+
+    if not instrument_type:
+        return "Тип инструмента не найден."
+
+    await callback.message.edit_text(
+        "Выберите бренд:",
+        reply_markup=await create_shop_brand_keyboard(
+            db_pool,
+            instrument_type,
+        ),
+    )
+
+    return None
+
+
+async def shop_models(
+    callback: CallbackQuery,
+    instrument_type: str,
+    brand: str,
+    db_pool: object,
+) -> str | None:
+    if callback.message is None:
+        return None
+
+    if not instrument_type or not brand:
+        return "Марка или тип инструмента не найдены."
+
+    await callback.message.edit_text(
+        "Выберите модель:",
+        reply_markup=await create_shop_model_keyboard(
+            db_pool,
+            instrument_type,
+            brand,
+        ),
+    )
+
+    return None
+
+
+async def shop_model_preview(
+    callback: CallbackQuery,
+    callback_data: ShopAction,
+    instrument_type: str,
+    brand: str,
+    db_pool: object,
+) -> str | None:
+    if callback.message is None:
+        return None
+
+    model = callback_data.model
+
+    if not instrument_type or not brand or not model:
+        return "Модель не найдена."
+
+    item = await get_item_by_brand_model(
+        db_pool,
+        brand,
+        model,
+    )
+
+    if item is None:
+        return "Модель не найдена в каталоге."
+
+    item_type = str(item.get("type")).title()
+    item_brand = str(item.get("brand")).title()
+    item_model = str(item.get("model")).title()
+    rarity = str(item.get("rarity")).title()
+    genre = str(item.get("genre", "")).replace("_", " ").title()
+    description = str(item.get("description")) or "Описание отсутствует."
+    price = item.get("price")
+    is_stackable = bool(item.get("is_stackable"))
+    bonus = item.get("proficiency_bonus")
+
+    text = (
+        f"<b>{item_brand} {item_model}</b>\n"
+        f"Тип: {item_type}\n"
+        f"Цена: {price} coins\n"
+        f"Редкость: {rarity}\n"
+        f"Жанр: {genre}\n"
+        f"Стакается: {'Да' if is_stackable else 'Нет'}\n"
+        f"Бонус мастерства: +{bonus}\n\n"
+        f"{html.quote(description)}"
+    )
+
+    await callback.message.edit_text(
+        text,
+        reply_markup=create_shop_model_preview_keyboard(
+            instrument_type,
+            brand,
+            model,
+        ),
+    )
+
+    return None
+
+
+async def shop_buy(
+    callback: CallbackQuery,
+    callback_data: ShopAction,
+    instrument_type: str,
+    brand: str,
+    db_pool: object,
+) -> str | None:
+    model = callback_data.model
+
+    if not instrument_type or not brand or not model:
+        return "Модель не найдена."
+
+    item = await get_item_by_brand_model(
+        db_pool,
+        brand,
+        model,
+    )
+
+    if item is None:
+        return "Модель не найдена в каталоге."
+
+    user = await get_user(
+        db_pool,
+        callback.from_user.id,
+    )
+
+    if user is None:
+        return "Пользователь не найден."
+
+    price = int(item.get("price", 0))
+    coins = int(user.get("coins", 0))
+
+    if coins < price:
+        return "У вас недостаточно монет для покупки этого предмета."
+
+    await take_user_coins(
+        db_pool,
+        callback.from_user.id,
+        price,
+    )
+
+    await add_item_to_inventory(
+        db_pool,
+        callback.from_user.id,
+        item["id"],
+    )
+
+    return (
+        f"Вы успешно купили "
+        f"{item['brand']} {item['model']} "
+        f"за {price} coins!"
+    )

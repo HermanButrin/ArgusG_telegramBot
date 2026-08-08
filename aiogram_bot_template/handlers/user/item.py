@@ -60,7 +60,7 @@ async def item(msg: types.Message, **kwargs: object) -> None:
             "<b>Допустимые значения:</b>\n"
             f"🎸 <b>Тип:</b>\n {', '.join(ALLOWED_TYPES)}\n"
             f"⭐ <b>Редкость:</b>\n {', '.join(ALLOWED_RARITIES)}\n"
-            f"🎵 <b>Жанр:</b>\n• " + "\n• ".join(ALLOWED_GENRES) + "\n\n"
+            f"🎵 <b>Жанр:</b>\n• " + "\n• ".join(ALLOWED_GENRES) + "\n\n",
         )
         return
 
@@ -73,11 +73,11 @@ async def item(msg: types.Message, **kwargs: object) -> None:
     if action == "remove":
         await item_remove(msg, args[1:], kwargs)
         return
-    
+
     if action == "remove_brand":
         await brand_remove(msg, args[1:], kwargs)
         return
-    
+
     if action == "list":
         await item_list(msg, kwargs)
         return
@@ -230,7 +230,8 @@ async def item_remove(
     await msg.answer(
         f"🗑 Предмет {brand} {model} удалён.",
     )
-    
+
+
 async def brand_remove(
     msg: types.Message,
     args: list[str],
@@ -265,7 +266,8 @@ async def brand_remove(
     await msg.answer(
         f"🗑 Бренд {brand} удалён.",
     )
-    
+
+
 async def item_list(
     msg: types.Message,
     kwargs: dict,
@@ -291,8 +293,8 @@ async def item_list(
 
     message_lines = ["📦 <b>Список предметов:</b>\n"]
     for row in rows:
-        message_lines.append(
-            f"• {row['id']} {row['brand']} {row['model']} ({row['type']})"
+        message_lines.extend(
+            f"• {row['id']} {row['brand']} {row['model']} ({row['type']})",
         )
 
     await msg.answer("\n".join(message_lines))

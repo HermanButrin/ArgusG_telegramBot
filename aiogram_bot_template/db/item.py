@@ -162,10 +162,10 @@ async def get_distinct_brands_by_type(pool: Pool, instrument_type: str) -> list[
     return [row["brand"] for row in rows]
 
 
-async def get_distinct_models_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
+async def get_models_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
     rows = await pool.fetch(
         """
-        SELECT DISTINCT model
+        SELECT model
         FROM item
         WHERE lower(type) = lower($1) AND lower(brand) = lower($2)
         ORDER BY model
@@ -176,10 +176,10 @@ async def get_distinct_models_by_brand(pool: Pool, instrument_type: str, brand: 
     return [row["model"] for row in rows]
 
 
-async def get_distinct_models_with_rarity_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
+async def get_models_with_rarity_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
     rows = await pool.fetch(
         """
-        SELECT DISTINCT ON (lower(model))
+        SELECT ON (lower(model))
             model,
             rarity
         FROM item

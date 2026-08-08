@@ -5,7 +5,7 @@ from aiogram_bot_template.db.item import (
     ALLOWED_TYPES,
     ALLOWED_RARITIES,
     get_distinct_brands_by_type,
-    get_distinct_models_with_rarity_by_brand,
+    get_models_with_rarity_by_brand,
 )
 from aiogram_bot_template.keyboards.inline.callbacks import Action, ShopAction
 from aiogram_bot_template.keyboards.inline.consts import InlineConstructor
@@ -66,7 +66,7 @@ async def create_shop_brand_keyboard(pool: Pool, instrument_type: str) -> Inline
 
 
 async def create_shop_model_keyboard(pool: Pool, instrument_type: str, brand: str) -> InlineKeyboardMarkup:
-    models = await get_distinct_models_with_rarity_by_brand(pool, instrument_type, brand)
+    models = await get_models_with_rarity_by_brand(pool, instrument_type, brand)
 
     actions = [
         {

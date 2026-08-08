@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from aiogram import html
+from aiogram_bot_template.db.user import get_user
 from aiogram_bot_template.keyboards.inline.user.back import create_back
 
 
@@ -28,8 +29,13 @@ async def profile(callback: CallbackQuery, **kwargs: object) -> None:
     if callback.message is None:
         await callback.answer()
         return
+    
+    db_pool = kwargs.get("db_pool")
+    if db_pool is None:
+        await callback.answer("База данных недоступна.", show_alert=True)
+        return
 
-    user_row = kwargs.get("user")
+    user_row = await get_user(db_pool, callback.from_user.id)
     if not user_row:
         await callback.answer(
             "Профиль пока не найден. Сначала нажмите /start, чтобы сохранить пользователя.",

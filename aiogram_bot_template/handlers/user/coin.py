@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery
 import secrets
 from datetime import datetime, timezone
 
-
+from aiogram_bot_template.db.user import get_user
 from aiogram_bot_template.db.user import award_user_coins
 
 
@@ -16,7 +16,7 @@ async def coin(callback: CallbackQuery, **kwargs: object) -> None:
     if db_pool is None:
         return
 
-    user_row = kwargs.get("user")
+    user_row = await get_user(db_pool, callback.from_user.id)
     now = datetime.now(timezone.utc)
     cooldown_until = None
     if isinstance(user_row, dict):

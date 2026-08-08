@@ -104,6 +104,18 @@ async def remove_item(pool: Pool, brand: str, model: str) -> bool:
     return result != "DELETE 0"
 
 
+async def remove_brand(pool: Pool, brand: str) -> bool:
+    result = await pool.execute(
+        """
+        DELETE FROM item
+        WHERE lower(brand)=lower($1)
+        """,
+        brand,
+    )
+
+    return result != "DELETE 0"
+
+
 async def get_item_by_id(pool: Pool, item_id: int) -> dict | None:
     row = await pool.fetchrow(
         """
@@ -198,6 +210,7 @@ async def get_all_items(pool: Pool) -> list[dict]:
         """
         SELECT *
         FROM item
+        ORDER BY brand, model, type
         """,
     )
     return [dict(row) for row in rows]

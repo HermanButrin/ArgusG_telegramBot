@@ -9,6 +9,7 @@ from aiogram_bot_template.db.item import (
     ALLOWED_TYPES,
     insert_item,
     item_exists,
+    remove_brand,
     remove_item,
 )
 
@@ -17,7 +18,8 @@ ALLOWED_GENRES_SET: Final[set[str]] = set(ALLOWED_GENRES)
 ALLOWED_TYPES_SET: Final[set[str]] = set(ALLOWED_TYPES)
 
 ITEM_ADD_ARGUMENTS_COUNT: Final = 9
-ITEM_REMOVE_ARGUMENTS_COUNT: Final = 3
+ITEM_REMOVE_ARGUMENTS_COUNT: Final = 2
+BRAND_REMOVE_ARGUMENTS_COUNT: Final = 1
 
 
 def parse_item_command(text: str) -> list[str] | None:
@@ -46,19 +48,19 @@ async def item(msg: types.Message, **kwargs: object) -> None:
             "📦 <b>Управление предметами</b>\n\n"
             "<b>Доступные команды:</b>\n"
             "• <code>/item add</code> — добавить предмет\n"
-            "• <code>/item remove</code> — удалить предмет\n\n"
+            "• <code>/item remove</code> — удалить предмет\n"
+            "• <code>/item remove_brand</code> — удалить бренд\n"
+            "• <code>/item list</code> — показать список предметов\n\n"
             "<b>Формат:</b>\n"
-            '<code>/item add "Тип" "Бренд" "Модель" '
-            '"Описание" Цена Редкость Жанр Stackable Бонус</code>\n\n'
+            '<code>/item add type brand model '
+            'description price rarity genre stackable bonus</code>\n\n'
             "<b>Пример:</b>\n"
-            '<code>/item add "guitar" "Gibson" "Flying V" '
+            '<code>/item add guitar Gibson "Flying V" '
             '"Черная электрогитара" 1000 epic "heavy metal" true 5</code>\n\n'
             "<b>Допустимые значения:</b>\n"
-            f"🎸 <b>Тип:</b> {', '.join(ALLOWED_TYPES)}\n"
-            f"⭐ <b>Редкость:</b> {', '.join(ALLOWED_RARITIES)}\n"
+            f"🎸 <b>Тип:</b>\n {', '.join(ALLOWED_TYPES)}\n"
+            f"⭐ <b>Редкость:</b>\n {', '.join(ALLOWED_RARITIES)}\n"
             f"🎵 <b>Жанр:</b>\n• " + "\n• ".join(ALLOWED_GENRES) + "\n\n"
-            "📚 <b>Stackable:</b> true / false\n"
-            "⚔ <b>Бонус:</b> целое число",
         )
         return
 
@@ -71,13 +73,23 @@ async def item(msg: types.Message, **kwargs: object) -> None:
     if action == "remove":
         await item_remove(msg, args[1:], kwargs)
         return
+    
+    if action == "remove_brand":
+        await brand_remove(msg, args[1:], kwargs)
+        return
+    
+    if action == "list":
+        await item_list(msg, kwargs)
+        return
 
     await msg.answer(
         "❌ Неизвестная команда.\n"
         "Используй:\n"
         "/item\n"
         "/item add\n"
-        "/item remove",
+        "/item remove\n"
+        "/item remove_brand\n"
+        "/item list",
     )
 
 
@@ -188,7 +200,7 @@ async def item_remove(
 
     if len(args) != ITEM_REMOVE_ARGUMENTS_COUNT:
         await msg.answer(
-            "❌ Использование:\n/item remove тип бренд модель",
+            "❌ Использование:\n/item remove бренд модель",
         )
         return
 
@@ -218,3 +230,69 @@ async def item_remove(
     await msg.answer(
         f"🗑 Предмет {brand} {model} удалён.",
     )
+    
+async def brand_remove(
+    msg: types.Message,
+    args: list[str],
+    kwargs: dict,
+) -> None:
+
+    if len(args) != BRAND_REMOVE_ARGUMENTS_COUNT:
+        await msg.answer(
+            "❌ Использование:\n/item remove_brand бренд",
+        )
+        return
+
+    brand = args[0].lower()
+
+    pool = kwargs.get("db_pool")
+
+    if pool is None:
+        await msg.answer("❌ Ошибка базы данных.")
+        return
+
+    deleted = await remove_brand(
+        pool,
+        brand,
+    )
+
+    if not deleted:
+        await msg.answer(
+            "❌ Бренд не найден.",
+        )
+        return
+
+    await msg.answer(
+        f"🗑 Бренд {brand} удалён.",
+    )
+    
+async def item_list(
+    msg: types.Message,
+    kwargs: dict,
+) -> None:
+
+    pool = kwargs.get("db_pool")
+
+    if pool is None:
+        await msg.answer("❌ Ошибка базы данных.")
+        return
+
+    rows = await pool.fetch(
+        """
+        SELECT *
+        FROM item
+        ORDER BY type, brand, model
+        """,
+    )
+
+    if not rows:
+        await msg.answer("📦 Список предметов пуст.")
+        return
+
+    message_lines = ["📦 <b>Список предметов:</b>\n"]
+    for row in rows:
+        message_lines.append(
+            f"• {row['id']} {row['brand']} {row['model']} ({row['type']})"
+        )
+
+    await msg.answer("\n".join(message_lines))

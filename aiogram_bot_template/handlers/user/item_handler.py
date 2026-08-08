@@ -3,7 +3,7 @@ from typing import Final
 
 from aiogram import types
 
-from aiogram_bot_template.db.item import (
+from aiogram_bot_template.db.item_db import (
     ALLOWED_GENRES,
     ALLOWED_RARITIES,
     ALLOWED_TYPES,

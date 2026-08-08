@@ -5,7 +5,7 @@ from typing import Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Update
 
-from aiogram_bot_template.db.user import user_exists, update_last_active
+from aiogram_bot_template.db.user_db import user_exists, update_last_active
 
 
 class UserActivityMiddleware(BaseMiddleware):

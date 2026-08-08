@@ -3,8 +3,8 @@ from aiogram.types import CallbackQuery
 import secrets
 from datetime import datetime, timezone
 
-from aiogram_bot_template.db.user import get_user
-from aiogram_bot_template.db.user import give_user_coins
+from aiogram_bot_template.db.user_db import get_user
+from aiogram_bot_template.db.user_db import give_user_coins
 
 
 async def coin(callback: CallbackQuery, **kwargs: object) -> None:

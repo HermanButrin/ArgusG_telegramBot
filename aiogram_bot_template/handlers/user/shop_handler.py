@@ -1,11 +1,11 @@
 from aiogram import html
 from aiogram.types import CallbackQuery
 
-from aiogram_bot_template.db.user import get_user, take_user_coins
-from aiogram_bot_template.db.item import get_item_by_brand_model
-from aiogram_bot_template.db.inventory import add_item_to_inventory
+from aiogram_bot_template.db.user_db import get_user, take_user_coins
+from aiogram_bot_template.db.item_db import get_item_by_brand_model
+from aiogram_bot_template.db.inventory_db import add_item_to_inventory
 from aiogram_bot_template.keyboards.inline.callbacks import ShopAction
-from aiogram_bot_template.keyboards.inline.user.shop import (
+from aiogram_bot_template.keyboards.inline.user.shop_inline import (
     create_shop_brand_keyboard,
     create_shop_model_keyboard,
     create_shop_model_preview_keyboard,

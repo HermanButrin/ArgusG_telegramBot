@@ -1,7 +1,7 @@
 from asyncpg import Pool
 from aiogram.types import InlineKeyboardMarkup
 
-from aiogram_bot_template.db.item import (
+from aiogram_bot_template.db.item_db import (
     ALLOWED_TYPES,
     ALLOWED_RARITIES,
     get_distinct_brands_by_type,

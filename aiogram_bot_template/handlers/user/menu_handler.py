@@ -1,7 +1,7 @@
 from aiogram import html, types
 
-from aiogram_bot_template.db.user import upsert_user
-from aiogram_bot_template.keyboards.inline.user.start_menu import create_start_menu
+from aiogram_bot_template.db.user_db import upsert_user
+from aiogram_bot_template.keyboards.inline.user.start_menu_inline import create_start_menu
 from aiogram.types import CallbackQuery
 
 

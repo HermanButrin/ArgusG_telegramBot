@@ -1,7 +1,7 @@
 from typing import Final
 from aiogram import types
 
-from aiogram_bot_template.db.user import ban_user_by_username
+from aiogram_bot_template.db.user_db import ban_user_by_username
 
 ARGUMENTS_COUNT: Final = 2
 

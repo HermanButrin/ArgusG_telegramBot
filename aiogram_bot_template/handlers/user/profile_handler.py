@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from aiogram import html
-from aiogram_bot_template.db.user import get_user
-from aiogram_bot_template.keyboards.inline.user.back import create_back
+from aiogram_bot_template.db.user_db import get_user
+from aiogram_bot_template.keyboards.inline.user.back_inline import create_back
 
 
 def _format_timestamp(value: datetime | None, timezone_name: str) -> str:

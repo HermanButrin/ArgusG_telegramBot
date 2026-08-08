@@ -2,7 +2,7 @@ import asyncpg
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 
-from aiogram_bot_template.db.user import is_user_admin
+from aiogram_bot_template.db.user_db import is_user_admin
 
 
 class AdminFilter(BaseFilter):

@@ -117,9 +117,8 @@ async def get_item_by_id(pool: Pool, item_id: int) -> dict | None:
     return dict(row) if row else None
 
 
-async def get_item_by_type_brand_model(
+async def get_item_by_brand_model(
     pool: Pool,
-    instrument_type: str,
     brand: str,
     model: str,
 ) -> dict | None:
@@ -127,11 +126,9 @@ async def get_item_by_type_brand_model(
         """
         SELECT *
         FROM item
-        WHERE lower(type) = lower($1)
-          AND lower(brand) = lower($2)
-          AND lower(model) = lower($3)
+        WHERE lower(brand) = lower($1)
+          AND lower(model) = lower($2)
         """,
-        instrument_type,
         brand,
         model,
     )

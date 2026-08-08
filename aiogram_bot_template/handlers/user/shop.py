@@ -1,7 +1,7 @@
 from aiogram import html
 from aiogram.types import CallbackQuery
 
-from aiogram_bot_template.db.item import get_item_by_type_brand_model
+from aiogram_bot_template.db.item import get_item_by_brand_model
 from aiogram_bot_template.keyboards.inline.callbacks import ShopAction
 from aiogram_bot_template.keyboards.inline.user.shop import (
     create_shop_brand_keyboard,
@@ -68,7 +68,7 @@ async def shop_callback(callback: CallbackQuery, callback_data: ShopAction, **kw
             await callback.answer("Модель не найдена.", show_alert=True)
             return
 
-        item = await get_item_by_type_brand_model(db_pool, instrument_type, brand, callback_data.model)
+        item = await get_item_by_brand_model(db_pool, brand, callback_data.model)
         if item is None:
             await callback.answer("Модель не найдена в каталоге.", show_alert=True)
             return

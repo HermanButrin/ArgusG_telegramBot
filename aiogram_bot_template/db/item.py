@@ -175,9 +175,7 @@ async def get_models_by_brand(pool: Pool, instrument_type: str, brand: str) -> l
 async def get_models_with_rarity_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
     rows = await pool.fetch(
         """
-        SELECT ON (lower(model))
-            model,
-            rarity
+        SELECT (lower(model)) AS model, rarity
         FROM item
         WHERE lower(type) = lower($1)
           AND lower(brand) = lower($2)

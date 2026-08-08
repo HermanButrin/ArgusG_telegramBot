@@ -4,7 +4,7 @@ import secrets
 from datetime import datetime, timezone
 
 from aiogram_bot_template.db.user import get_user
-from aiogram_bot_template.db.user import award_user_coins
+from aiogram_bot_template.db.user import give_user_coins
 
 
 async def coin(callback: CallbackQuery, **kwargs: object) -> None:
@@ -34,5 +34,5 @@ async def coin(callback: CallbackQuery, **kwargs: object) -> None:
 
     cooldown_until = now.fromtimestamp(int(now.timestamp()) + 3600, tz=timezone.utc)
 
-    await award_user_coins(db_pool, callback.from_user.id, amount, cooldown_until)
+    await give_user_coins(db_pool, callback.from_user.id, amount, cooldown_until)
     await callback.answer(f"Вы получили {amount} монет! 🎉", show_alert=True)

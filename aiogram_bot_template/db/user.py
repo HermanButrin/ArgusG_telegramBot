@@ -132,7 +132,7 @@ async def unban_user_by_username(pool: asyncpg.Pool, username: str) -> bool:
     return updated_user is not None
 
 
-async def award_user_coins(
+async def give_user_coins(
     pool: asyncpg.Pool,
     telegram_id: int,
     coins: int,

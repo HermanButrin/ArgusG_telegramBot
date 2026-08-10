@@ -9,17 +9,11 @@ async def add_item_to_inventory(
 ) -> None:
     await pool.execute(
         """
-        INSERT INTO "useritem" (user_id, item_id, quantity)
-        VALUES (
-            (SELECT id
-             FROM "user"
-             WHERE telegram_id = $1),
-            $2,
-            $3
-        )
-        ON CONFLICT (user_id, item_id)
+        INSERT INTO useritem (telegram_id, item_id, quantity)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (telegram_id, item_id)
         DO UPDATE SET
-            quantity = "useritem".quantity + EXCLUDED.quantity
+            quantity = useritem.quantity + EXCLUDED.quantity
         """,
         telegram_id,
         item_id,
@@ -35,14 +29,10 @@ async def remove_item_from_inventory(
 ) -> None:
     await pool.execute(
         """
-        UPDATE "useritem"
+        UPDATE useritem
         SET quantity = quantity - $3
-        WHERE user_id = (
-            SELECT id
-            FROM "user"
-            WHERE telegram_id = $1
-        )
-        AND item_id = $2
+        WHERE telegram_id = $1
+          AND item_id = $2
         """,
         telegram_id,
         item_id,
@@ -51,13 +41,13 @@ async def remove_item_from_inventory(
 
     await pool.execute(
         """
-        DELETE FROM "useritem"
+        DELETE FROM useritem
         WHERE quantity <= 0
-        """,
+        """
     )
 
 
-async def get_useritem(
+async def find_useritem_by_user_id(
     pool: asyncpg.Pool,
     telegram_id: int,
 ) -> list[dict[str, object]]:
@@ -65,20 +55,18 @@ async def get_useritem(
         """
         SELECT
             i.id,
-            i.name,
+            i.type,
+            i.brand,
+            i.model,
             i.description,
             i.price,
             i.rarity,
             ui.quantity
-        FROM "useritem" ui
-        JOIN "item" i
+        FROM useritem ui
+        JOIN item i
             ON ui.item_id = i.id
-        WHERE ui.user_id = (
-            SELECT id
-            FROM "user"
-            WHERE telegram_id = $1
-        )
-        ORDER BY i.rarity DESC, i.name
+        WHERE ui.telegram_id = $1
+        ORDER BY i.rarity DESC, i.brand, i.model
         """,
         telegram_id,
     )
@@ -93,14 +81,10 @@ async def user_has_item(
 ) -> bool:
     row = await pool.fetchrow(
         """
-        SELECT quantity
-        FROM "useritem"
-        WHERE user_id = (
-            SELECT id
-            FROM "user"
-            WHERE telegram_id = $1
-        )
-        AND item_id = $2
+        SELECT 1
+        FROM useritem
+        WHERE telegram_id = $1
+          AND item_id = $2
         """,
         telegram_id,
         item_id,
@@ -117,13 +101,9 @@ async def get_item_quantity(
     row = await pool.fetchrow(
         """
         SELECT quantity
-        FROM "useritem"
-        WHERE user_id = (
-            SELECT id
-            FROM "user"
-            WHERE telegram_id = $1
-        )
-        AND item_id = $2
+        FROM useritem
+        WHERE telegram_id = $1
+          AND item_id = $2
         """,
         telegram_id,
         item_id,

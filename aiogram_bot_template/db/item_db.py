@@ -116,7 +116,7 @@ async def remove_brand(pool: Pool, brand: str) -> bool:
     return result != "DELETE 0"
 
 
-async def get_item_by_id(pool: Pool, item_id: int) -> dict | None:
+async def get_item(pool: Pool, item_id: int) -> dict | None:
     row = await pool.fetchrow(
         """
         SELECT *

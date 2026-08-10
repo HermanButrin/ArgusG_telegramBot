@@ -33,7 +33,9 @@ def prepare_router() -> Router:
     user_router.message.register(ban_handler.ban, Command("ban"), AdminFilter())
     user_router.message.register(unban_handler.unban, Command("unban"), AdminFilter())
     user_router.message.register(
-        promote_handler.promote, Command("promote"), AdminFilter(),
+        promote_handler.promote,
+        Command("promote"),
+        AdminFilter(),
     )
     user_router.callback_query.register(
         musician_handler.musician,

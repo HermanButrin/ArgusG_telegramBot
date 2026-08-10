@@ -1,4 +1,5 @@
 from typing import Final
+
 from aiogram import types
 
 from aiogram_bot_template.db.user_db import promote_user_by_username

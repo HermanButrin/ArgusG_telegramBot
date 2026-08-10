@@ -1,5 +1,5 @@
 import shlex
-from typing import Final, cast, TYPE_CHECKING
+from typing import cast, Final, TYPE_CHECKING
 
 from aiogram import types
 

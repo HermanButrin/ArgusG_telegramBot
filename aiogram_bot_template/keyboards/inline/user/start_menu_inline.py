@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup
 
-from aiogram_bot_template.keyboards.inline.consts import InlineConstructor
 from aiogram_bot_template.keyboards.inline.callbacks import Action
+from aiogram_bot_template.keyboards.inline.consts import InlineConstructor
 
 
 def create_start_menu() -> InlineKeyboardMarkup:

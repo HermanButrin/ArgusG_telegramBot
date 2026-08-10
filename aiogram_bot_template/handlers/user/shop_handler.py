@@ -4,8 +4,8 @@ from aiogram import html, types
 from aiogram.types import CallbackQuery
 from asyncpg import Pool
 
-from aiogram_bot_template.db.item_db import get_item_by_brand_model
 from aiogram_bot_template.db.inventory_db import add_item_to_inventory
+from aiogram_bot_template.db.item_db import get_item_by_brand_model
 from aiogram_bot_template.db.user_db import get_user, take_user_coins
 from aiogram_bot_template.keyboards.inline.callbacks import ShopAction
 from aiogram_bot_template.keyboards.inline.user.shop_inline import (

@@ -6,21 +6,21 @@ from aiogram_bot_template.filters import (
     AdminFilter,
     BannedFilter,
     ChatTypeFilter,
-    TextFilter as TextFilter,
 )
+from aiogram_bot_template.filters import TextFilter as TextFilter
+from aiogram_bot_template.keyboards.inline.callbacks import Action, ShopAction
 
 from . import (
     ban_handler,
     coin_handler,
     item_handler,
     menu_handler,
+    musician_handler,
     profile_handler,
     promote_handler,
     shop_handler,
     unban_handler,
-    musician_handler,
 )
-from aiogram_bot_template.keyboards.inline.callbacks import Action, ShopAction
 
 
 def prepare_router() -> Router:

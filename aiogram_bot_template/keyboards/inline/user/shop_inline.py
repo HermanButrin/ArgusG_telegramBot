@@ -1,11 +1,11 @@
 from typing import Any, cast
 
-from asyncpg import Pool
 from aiogram.types import InlineKeyboardMarkup
+from asyncpg import Pool
 
 from aiogram_bot_template.db.item_db import (
-    ALLOWED_TYPES,
     ALLOWED_RARITIES,
+    ALLOWED_TYPES,
     get_distinct_brands_by_type,
     get_models_with_rarity_by_brand,
 )

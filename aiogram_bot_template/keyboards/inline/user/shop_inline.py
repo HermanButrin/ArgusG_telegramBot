@@ -14,7 +14,7 @@ from aiogram_bot_template.keyboards.inline.consts import InlineConstructor
 
 
 def _keyboard_rows(
-    actions: list[dict[str, object]], rows_per_line: int = 1
+    actions: list[dict[str, object]], rows_per_line: int = 1,
 ) -> list[int]:
     if not actions:
         return []
@@ -43,12 +43,12 @@ def create_shop_type_keyboard() -> InlineKeyboardMarkup:
     actions.append({"text": "◀️ Назад", "callback_data": Action(action="menu")})
 
     return InlineConstructor.create_keyboard(
-        cast("Any", actions), _keyboard_rows(actions)
+        cast("Any", actions), _keyboard_rows(actions),
     )
 
 
 async def create_shop_brand_keyboard(
-    pool: Pool, instrument_type: str
+    pool: Pool, instrument_type: str,
 ) -> InlineKeyboardMarkup:
     brands = await get_distinct_brands_by_type(pool, instrument_type)
 
@@ -71,12 +71,12 @@ async def create_shop_brand_keyboard(
     )
 
     return InlineConstructor.create_keyboard(
-        cast("Any", actions), _keyboard_rows(actions)
+        cast("Any", actions), _keyboard_rows(actions),
     )
 
 
 async def create_shop_model_keyboard(
-    pool: Pool, instrument_type: str, brand: str
+    pool: Pool, instrument_type: str, brand: str,
 ) -> InlineKeyboardMarkup:
     models = await get_models_with_rarity_by_brand(pool, instrument_type, brand)
 
@@ -106,7 +106,7 @@ async def create_shop_model_keyboard(
     )
 
     return InlineConstructor.create_keyboard(
-        cast("Any", actions), _keyboard_rows(actions)
+        cast("Any", actions), _keyboard_rows(actions),
     )
 
 

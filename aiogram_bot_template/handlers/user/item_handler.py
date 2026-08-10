@@ -304,7 +304,7 @@ async def item_list(
     message_lines = ["📦 <b>Список предметов:</b>\n"]
     for row in rows:
         message_lines.extend(
-            f"• {row['id']} {row['brand']} {row['model']} ({row['type']})"
+            f"• {row['id']} {row['brand']} {row['model']} ({row['type']})",
         )
 
     await msg.answer("\n".join(message_lines))

@@ -175,7 +175,7 @@ async def get_distinct_brands_by_type(pool: Pool, instrument_type: str) -> list[
 
 
 async def get_models_by_brand(
-    pool: Pool, instrument_type: str, brand: str
+    pool: Pool, instrument_type: str, brand: str,
 ) -> list[str]:
     rows = await pool.fetch(
         """
@@ -191,7 +191,7 @@ async def get_models_by_brand(
 
 
 async def get_models_with_rarity_by_brand(
-    pool: Pool, instrument_type: str, brand: str
+    pool: Pool, instrument_type: str, brand: str,
 ) -> list[ItemRow]:
     rows = await pool.fetch(
         """

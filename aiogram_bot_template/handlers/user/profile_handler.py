@@ -17,7 +17,9 @@ def _format_timestamp(value: datetime | None, timezone_name: str) -> str:
     except ZoneInfoNotFoundError:
         user_tz = timezone.utc
 
-    aware_value = value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+    aware_value = (
+        value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+    )
     return aware_value.astimezone(user_tz).strftime("%Y-%m-%d %H:%M:%S")
 
 

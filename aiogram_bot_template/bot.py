@@ -14,7 +14,10 @@ from redis.asyncio import Redis
 
 from aiogram_bot_template import handlers, utils, web_handlers
 from aiogram_bot_template.data import config
-from aiogram_bot_template.middlewares import StructLoggingMiddleware, UserActivityMiddleware
+from aiogram_bot_template.middlewares import (
+    StructLoggingMiddleware,
+    UserActivityMiddleware,
+)
 
 if TYPE_CHECKING:
     import asyncpg

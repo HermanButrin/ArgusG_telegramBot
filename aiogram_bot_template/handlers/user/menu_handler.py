@@ -2,7 +2,9 @@ from aiogram import html, types
 from aiogram.types import CallbackQuery
 
 from aiogram_bot_template.db.user_db import upsert_user
-from aiogram_bot_template.keyboards.inline.user.start_menu_inline import create_start_menu
+from aiogram_bot_template.keyboards.inline.user.start_menu_inline import (
+    create_start_menu,
+)
 
 
 async def menu(msg: types.Message, **kwargs: object) -> None:

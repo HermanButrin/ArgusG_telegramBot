@@ -37,7 +37,9 @@ async def coin(callback: CallbackQuery, **kwargs: object) -> None:
         )
         return
 
-    cooldown_until = datetime.fromtimestamp(int(now.timestamp()) + 3600, tz=timezone.utc)
+    cooldown_until = datetime.fromtimestamp(
+        int(now.timestamp()) + 3600, tz=timezone.utc
+    )
 
     await give_user_coins(pool, from_user.id, amount, cooldown_until)
     await callback.answer(f"Вы получили {amount} монет! 🎉", show_alert=True)

@@ -56,7 +56,9 @@ async def shop_callback(
     elif action == "shop_models":
         result = await shop_models(callback, instrument_type, brand, pool)
     elif action == "shop_model_preview":
-        result = await shop_model_preview(callback, callback_data, instrument_type, brand, pool)
+        result = await shop_model_preview(
+            callback, callback_data, instrument_type, brand, pool
+        )
     elif action == "shop_buy":
         result = await shop_buy(callback, callback_data, instrument_type, brand, pool)
     else:

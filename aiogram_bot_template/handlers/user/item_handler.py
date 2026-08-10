@@ -55,8 +55,8 @@ async def item(msg: types.Message, **kwargs: object) -> None:
             "• <code>/item remove_brand</code> — удалить бренд\n"
             "• <code>/item list</code> — показать список предметов\n\n"
             "<b>Формат:</b>\n"
-            '<code>/item add type brand model '
-            'description price rarity genre stackable bonus</code>\n\n'
+            "<code>/item add type brand model "
+            "description price rarity genre stackable bonus</code>\n\n"
             "<b>Пример:</b>\n"
             '<code>/item add guitar Gibson "Flying V" '
             '"Черная электрогитара" 1000 epic "heavy metal" true 5</code>\n\n'
@@ -113,7 +113,17 @@ async def item_add(
         )
         return
 
-    instrument_type, brand, model, description, price_text, rarity, genre, stackable_text, bonus_text = (
+    (
+        instrument_type,
+        brand,
+        model,
+        description,
+        price_text,
+        rarity,
+        genre,
+        stackable_text,
+        bonus_text,
+    ) = (
         args[0].lower(),
         args[1].lower(),
         args[2].lower(),
@@ -293,6 +303,8 @@ async def item_list(
 
     message_lines = ["📦 <b>Список предметов:</b>\n"]
     for row in rows:
-        message_lines.extend(f"• {row['id']} {row['brand']} {row['model']} ({row['type']})")
+        message_lines.extend(
+            f"• {row['id']} {row['brand']} {row['model']} ({row['type']})"
+        )
 
     await msg.answer("\n".join(message_lines))

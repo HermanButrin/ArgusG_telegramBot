@@ -3,7 +3,9 @@ from aiogram.types import CallbackQuery
 
 from aiogram_bot_template.db.inventory_db import find_useritem_by_user_id
 from aiogram_bot_template.keyboards.inline.user.back_inline import create_back
-from aiogram_bot_template.keyboards.inline.user.musician_inline import create_musician_menu
+from aiogram_bot_template.keyboards.inline.user.musician_inline import (
+    create_musician_menu,
+)
 
 
 async def musician(callback: CallbackQuery, **kwargs: object) -> None:

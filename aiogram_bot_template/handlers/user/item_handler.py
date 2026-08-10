@@ -1,5 +1,5 @@
 import shlex
-from typing import Final
+from typing import Final, cast, TYPE_CHECKING
 
 from aiogram import types
 
@@ -12,6 +12,9 @@ from aiogram_bot_template.db.item_db import (
     remove_brand,
     remove_item,
 )
+
+if TYPE_CHECKING:
+    from asyncpg import Pool
 
 ALLOWED_RARITIES_SET: Final[set[str]] = set(ALLOWED_RARITIES)
 ALLOWED_GENRES_SET: Final[set[str]] = set(ALLOWED_GENRES)
@@ -100,9 +103,8 @@ async def item(msg: types.Message, **kwargs: object) -> None:
 async def item_add(
     msg: types.Message,
     args: list[str],
-    kwargs: dict,
+    kwargs: dict[str, object],
 ) -> None:
-
     if len(args) != ITEM_ADD_ARGUMENTS_COUNT:
         await msg.answer(
             "❌ <b>Формат:</b>\n"
@@ -156,11 +158,12 @@ async def item_add(
     proficiency_bonus = int(bonus_text)
     is_stackable = stackable_text == "true"
 
-    pool = kwargs.get("db_pool")
-
-    if pool is None:
+    pool_value = kwargs.get("db_pool")
+    if pool_value is None:
         await msg.answer("❌ Ошибка базы данных.")
         return
+
+    pool = cast("Pool", pool_value)
 
     if await item_exists(pool, instrument_type, brand, model):
         await msg.answer(
@@ -195,9 +198,8 @@ async def item_add(
 async def item_remove(
     msg: types.Message,
     args: list[str],
-    kwargs: dict,
+    kwargs: dict[str, object],
 ) -> None:
-
     if len(args) != ITEM_REMOVE_ARGUMENTS_COUNT:
         await msg.answer(
             "❌ Использование:\n/item remove бренд модель",
@@ -209,12 +211,12 @@ async def item_remove(
         args[1].lower(),
     )
 
-    pool = kwargs.get("db_pool")
-
-    if pool is None:
+    pool_value = kwargs.get("db_pool")
+    if pool_value is None:
         await msg.answer("❌ Ошибка базы данных.")
         return
 
+    pool = cast("Pool", pool_value)
     deleted = await remove_item(
         pool,
         brand,
@@ -235,9 +237,8 @@ async def item_remove(
 async def brand_remove(
     msg: types.Message,
     args: list[str],
-    kwargs: dict,
+    kwargs: dict[str, object],
 ) -> None:
-
     if len(args) != BRAND_REMOVE_ARGUMENTS_COUNT:
         await msg.answer(
             "❌ Использование:\n/item remove_brand бренд",
@@ -246,12 +247,12 @@ async def brand_remove(
 
     brand = args[0].lower()
 
-    pool = kwargs.get("db_pool")
-
-    if pool is None:
+    pool_value = kwargs.get("db_pool")
+    if pool_value is None:
         await msg.answer("❌ Ошибка базы данных.")
         return
 
+    pool = cast("Pool", pool_value)
     deleted = await remove_brand(
         pool,
         brand,
@@ -270,15 +271,14 @@ async def brand_remove(
 
 async def item_list(
     msg: types.Message,
-    kwargs: dict,
+    kwargs: dict[str, object],
 ) -> None:
-
-    pool = kwargs.get("db_pool")
-
-    if pool is None:
+    pool_value = kwargs.get("db_pool")
+    if pool_value is None:
         await msg.answer("❌ Ошибка базы данных.")
         return
 
+    pool = cast("Pool", pool_value)
     rows = await pool.fetch(
         """
         SELECT *
@@ -293,8 +293,6 @@ async def item_list(
 
     message_lines = ["📦 <b>Список предметов:</b>\n"]
     for row in rows:
-        message_lines.extend(
-            f"• {row['id']} {row['brand']} {row['model']} ({row['type']})",
-        )
+        message_lines.extend(f"• {row['id']} {row['brand']} {row['model']} ({row['type']})")
 
     await msg.answer("\n".join(message_lines))

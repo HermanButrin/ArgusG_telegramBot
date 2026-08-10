@@ -1,4 +1,8 @@
+from typing import Any, TypeAlias
+
 from asyncpg import Pool
+
+ItemRow: TypeAlias = dict[str, Any]
 
 ALLOWED_RARITIES = {
     "common": "",
@@ -100,8 +104,8 @@ async def remove_item(pool: Pool, brand: str, model: str) -> bool:
         brand,
         model,
     )
-
-    return result != "DELETE 0"
+    result_text = str(result)
+    return result_text != "DELETE 0"
 
 
 async def remove_brand(pool: Pool, brand: str) -> bool:
@@ -112,11 +116,11 @@ async def remove_brand(pool: Pool, brand: str) -> bool:
         """,
         brand,
     )
+    result_text = str(result)
+    return result_text != "DELETE 0"
 
-    return result != "DELETE 0"
 
-
-async def get_item(pool: Pool, item_id: int) -> dict | None:
+async def get_item(pool: Pool, item_id: int) -> ItemRow | None:
     row = await pool.fetchrow(
         """
         SELECT *
@@ -125,14 +129,14 @@ async def get_item(pool: Pool, item_id: int) -> dict | None:
         """,
         item_id,
     )
-    return dict(row) if row else None
+    return dict(row) if row is not None else None
 
 
 async def get_item_by_brand_model(
     pool: Pool,
     brand: str,
     model: str,
-) -> dict | None:
+) -> ItemRow | None:
     row = await pool.fetchrow(
         """
         SELECT *
@@ -143,7 +147,7 @@ async def get_item_by_brand_model(
         brand,
         model,
     )
-    return dict(row) if row else None
+    return dict(row) if row is not None else None
 
 
 async def get_distinct_instrument_types(pool: Pool) -> list[str]:
@@ -154,7 +158,7 @@ async def get_distinct_instrument_types(pool: Pool) -> list[str]:
         ORDER BY type
         """,
     )
-    return [row["type"] for row in rows]
+    return [str(row["type"]) for row in rows]
 
 
 async def get_distinct_brands_by_type(pool: Pool, instrument_type: str) -> list[str]:
@@ -167,7 +171,7 @@ async def get_distinct_brands_by_type(pool: Pool, instrument_type: str) -> list[
         """,
         instrument_type,
     )
-    return [row["brand"] for row in rows]
+    return [str(row["brand"]) for row in rows]
 
 
 async def get_models_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
@@ -181,10 +185,10 @@ async def get_models_by_brand(pool: Pool, instrument_type: str, brand: str) -> l
         instrument_type,
         brand,
     )
-    return [row["model"] for row in rows]
+    return [str(row["model"]) for row in rows]
 
 
-async def get_models_with_rarity_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[str]:
+async def get_models_with_rarity_by_brand(pool: Pool, instrument_type: str, brand: str) -> list[ItemRow]:
     rows = await pool.fetch(
         """
         SELECT (lower(model)) AS model, rarity
@@ -197,15 +201,15 @@ async def get_models_with_rarity_by_brand(pool: Pool, instrument_type: str, bran
         brand,
     )
 
-    models = [dict(row) for row in rows]
+    models: list[ItemRow] = [dict(row) for row in rows]
 
     return sorted(
         models,
-        key=lambda item: RARITY_ORDER[item["rarity"]],
+        key=lambda item: RARITY_ORDER.get(str(item.get("rarity", "common")), 0),
     )
 
 
-async def get_all_items(pool: Pool) -> list[dict]:
+async def get_all_items(pool: Pool) -> list[ItemRow]:
     rows = await pool.fetch(
         """
         SELECT *

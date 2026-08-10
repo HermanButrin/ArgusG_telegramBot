@@ -1,3 +1,5 @@
+from typing import Any, cast
+
 from asyncpg import Pool
 from aiogram.types import InlineKeyboardMarkup
 
@@ -26,7 +28,7 @@ def _keyboard_rows(actions: list[dict[str, object]], rows_per_line: int = 1) -> 
 
 
 def create_shop_type_keyboard() -> InlineKeyboardMarkup:
-    actions = [
+    actions: list[dict[str, object]] = [
         {
             "text": instrument_type.replace("_", " ").title(),
             "callback_data": ShopAction(
@@ -38,13 +40,13 @@ def create_shop_type_keyboard() -> InlineKeyboardMarkup:
     ]
     actions.append({"text": "◀️ Назад", "callback_data": Action(action="menu")})
 
-    return InlineConstructor.create_keyboard(actions, _keyboard_rows(actions))
+    return InlineConstructor.create_keyboard(cast("Any", actions), _keyboard_rows(actions))
 
 
 async def create_shop_brand_keyboard(pool: Pool, instrument_type: str) -> InlineKeyboardMarkup:
     brands = await get_distinct_brands_by_type(pool, instrument_type)
 
-    actions = [
+    actions: list[dict[str, object]] = [
         {
             "text": brand.title(),
             "callback_data": ShopAction(
@@ -62,24 +64,27 @@ async def create_shop_brand_keyboard(pool: Pool, instrument_type: str) -> Inline
         },
     )
 
-    return InlineConstructor.create_keyboard(actions, _keyboard_rows(actions))
+    return InlineConstructor.create_keyboard(cast("Any", actions), _keyboard_rows(actions))
 
 
 async def create_shop_model_keyboard(pool: Pool, instrument_type: str, brand: str) -> InlineKeyboardMarkup:
     models = await get_models_with_rarity_by_brand(pool, instrument_type, brand)
 
-    actions = [
-        {
-            "text": f"{ALLOWED_RARITIES.get(model['rarity'], '')} {model['model'].title()}",
-            "callback_data": ShopAction(
-                action="shop_model_preview",
-                instrument_type=instrument_type,
-                brand=brand,
-                model=model["model"],
-            ),
-        }
-        for model in models
-    ]
+    actions: list[dict[str, object]] = []
+    for model in models:
+        model_name = str(model.get("model", ""))
+        rarity = str(model.get("rarity", "common"))
+        actions.append(
+            {
+                "text": f"{ALLOWED_RARITIES.get(rarity, '')} {model_name.title()}",
+                "callback_data": ShopAction(
+                    action="shop_model_preview",
+                    instrument_type=instrument_type,
+                    brand=brand,
+                    model=model_name,
+                ),
+            },
+        )
     actions.append(
         {
             "text": "◀️ Назад",
@@ -90,7 +95,7 @@ async def create_shop_model_keyboard(pool: Pool, instrument_type: str, brand: st
         },
     )
 
-    return InlineConstructor.create_keyboard(actions, _keyboard_rows(actions))
+    return InlineConstructor.create_keyboard(cast("Any", actions), _keyboard_rows(actions))
 
 
 def create_shop_model_preview_keyboard(
@@ -99,24 +104,27 @@ def create_shop_model_preview_keyboard(
     model: str,
 ) -> InlineKeyboardMarkup:
     return InlineConstructor.create_keyboard(
-        [
-            {
-                "text": "💰 Купить",
-                "callback_data": ShopAction(
-                    action="shop_buy",
-                    instrument_type=instrument_type,
-                    brand=brand,
-                    model=model,
-                ),
-            },
-            {
-                "text": "◀️ Назад",
-                "callback_data": ShopAction(
-                    action="shop_models",
-                    instrument_type=instrument_type,
-                    brand=brand,
-                ),
-            },
-        ],
+        cast(
+            "Any",
+            [
+                {
+                    "text": "💰 Купить",
+                    "callback_data": ShopAction(
+                        action="shop_buy",
+                        instrument_type=instrument_type,
+                        brand=brand,
+                        model=model,
+                    ),
+                },
+                {
+                    "text": "◀️ Назад",
+                    "callback_data": ShopAction(
+                        action="shop_models",
+                        instrument_type=instrument_type,
+                        brand=brand,
+                    ),
+                },
+            ],
+        ),
         [1, 1],
     )

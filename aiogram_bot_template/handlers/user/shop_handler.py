@@ -15,6 +15,16 @@ from aiogram_bot_template.keyboards.inline.user.shop_inline import (
     create_shop_type_keyboard,
 )
 
+SHOP_TEXT = (
+    "<b>🛒 Магазин инструментов</b>\n\n"
+    "Здесь вы можете приобрести инструменты для своей коллекции.\n\n"
+    "<b>Выберите нужный раздел ниже:</b>\n"
+    "• 🎸 Тип инструмента\n"
+    "• 🏷 Бренд\n"
+    "• 🎵 Модель\n\n"
+    "Выберите товар, чтобы посмотреть его характеристики и стоимость."
+)
+
 
 async def shop(callback: CallbackQuery, **kwargs: object) -> None:
     if not isinstance(callback.message, types.Message):
@@ -27,13 +37,7 @@ async def shop(callback: CallbackQuery, **kwargs: object) -> None:
         return
 
     await callback.message.edit_text(
-        "<b>🛒 Магазин инструментов</b>\n\n"
-        "Здесь вы можете приобрести инструменты для своей коллекции.\n\n"
-        "<b>Выберите нужный раздел ниже:</b>\n"
-        "• 🎸 Тип инструмента\n"
-        "• 🏷 Бренд\n"
-        "• 🎵 Модель\n\n"
-        "Выберите товар, чтобы посмотреть его характеристики и стоимость.",
+        SHOP_TEXT,
         reply_markup=create_shop_type_keyboard(),
     )
 
@@ -86,13 +90,7 @@ async def shop_types(callback: CallbackQuery) -> str | None:
         return None
 
     await callback.message.edit_text(
-        "<b>🛒 Магазин инструментов</b>\n\n"
-        "Здесь вы можете приобрести инструменты для своей коллекции.\n\n"
-        "<b>Выберите нужный раздел ниже:</b>\n"
-        "• 🎸 Тип инструмента\n"
-        "• 🏷 Бренд\n"
-        "• 🎵 Модель\n\n"
-        "Выберите товар, чтобы посмотреть его характеристики и стоимость.",
+        SHOP_TEXT,
         reply_markup=create_shop_type_keyboard(),
     )
 
@@ -111,13 +109,7 @@ async def shop_brands(
         return "Тип инструмента не найден."
 
     await callback.message.edit_text(
-        "<b>🛒 Магазин инструментов</b>\n\n"
-        "Здесь вы можете приобрести инструменты для своей коллекции.\n\n"
-        "<b>Выберите нужный раздел ниже:</b>\n"
-        "• 🎸 Тип инструмента\n"
-        "• 🏷 Бренд\n"
-        "• 🎵 Модель\n\n"
-        "Выберите товар, чтобы посмотреть его характеристики и стоимость.",
+        SHOP_TEXT,
         reply_markup=await create_shop_brand_keyboard(db_pool, instrument_type),
     )
 
@@ -137,13 +129,7 @@ async def shop_models(
         return "Марка или тип инструмента не найдены."
 
     await callback.message.edit_text(
-        "<b>🛒 Магазин инструментов</b>\n\n"
-        "Здесь вы можете приобрести инструменты для своей коллекции.\n\n"
-        "<b>Выберите нужный раздел ниже:</b>\n"
-        "• 🎸 Тип инструмента\n"
-        "• 🏷 Бренд\n"
-        "• 🎵 Модель\n\n"
-        "Выберите товар, чтобы посмотреть его характеристики и стоимость.",
+        SHOP_TEXT,
         reply_markup=await create_shop_model_keyboard(db_pool, instrument_type, brand),
     )
 

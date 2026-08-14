@@ -212,7 +212,7 @@ async def shop_buy(
     if user is None:
         return "Пользователь не найден."
 
-    price_value = user.get("coins", 0)
+    price_value = item.get("price")
     price = price_value if isinstance(price_value, int) else 0
     coins_value = user.get("coins", 0)
     coins = coins_value if isinstance(coins_value, int) else 0

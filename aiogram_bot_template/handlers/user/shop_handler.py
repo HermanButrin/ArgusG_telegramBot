@@ -188,7 +188,7 @@ async def shop_model_preview(
     return None
 
 
-async def shop_buy(
+async def shop_buy(  # noqa: PLR0911
     callback: CallbackQuery,
     callback_data: ShopAction,
     instrument_type: str,
@@ -224,6 +224,9 @@ async def shop_buy(
 
     if result == PurchaseResult.ITEM_NOT_FOUND:
         return "Модель не найдена в каталоге."
+
+    if result == PurchaseResult.ITEM_ALREADY_OWNED:
+        return "У вас уже есть этот предмет."
 
     return (
         f"Вы успешно купили "

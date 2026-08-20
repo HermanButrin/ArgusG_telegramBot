@@ -29,8 +29,8 @@ version = "1.0"
 poetry-plugin-export = ">=1.8"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-aiogram = "^3"
+python = ">=3.10,<3.15"
+aiogram = "3.30.0"
 environs = "^14"
 redis = "^6"
 asyncpg = "0.30.0"

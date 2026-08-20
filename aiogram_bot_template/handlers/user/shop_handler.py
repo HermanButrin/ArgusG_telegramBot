@@ -4,9 +4,8 @@ from aiogram import html, types
 from aiogram.types import CallbackQuery
 from asyncpg import Pool
 
-from aiogram_bot_template.db.inventory_db import add_item_to_inventory
 from aiogram_bot_template.db.item_db import get_item_by_brand_model
-from aiogram_bot_template.db.user_db import get_user, take_user_coins
+from aiogram_bot_template.db.shop_db import buy_item, PurchaseResult
 from aiogram_bot_template.keyboards.inline.callbacks import ShopAction
 from aiogram_bot_template.keyboards.inline.user.shop_inline import (
     create_shop_brand_keyboard,
@@ -202,25 +201,32 @@ async def shop_buy(
     if not instrument_type or not brand or not model:
         return "Модель не найдена."
 
-    item = await get_item_by_brand_model(db_pool, brand, model)
+    item = await get_item_by_brand_model(
+        db_pool,
+        brand,
+        model,
+    )
 
     if item is None:
         return "Модель не найдена в каталоге."
 
-    user = await get_user(db_pool, from_user.id)
+    result = await buy_item(
+        db_pool,
+        from_user.id,
+        item["id"],
+    )
 
-    if user is None:
+    if result == PurchaseResult.USER_NOT_FOUND:
         return "Пользователь не найден."
 
-    price_value = item.get("price")
-    price = price_value if isinstance(price_value, int) else 0
-    coins_value = user.get("coins", 0)
-    coins = coins_value if isinstance(coins_value, int) else 0
-
-    if coins < price:
+    if result == PurchaseResult.NOT_ENOUGH_COINS:
         return "У вас недостаточно монет для покупки этого предмета."
 
-    await take_user_coins(db_pool, from_user.id, price)
-    await add_item_to_inventory(db_pool, from_user.id, item["id"])
+    if result == PurchaseResult.ITEM_NOT_FOUND:
+        return "Модель не найдена в каталоге."
 
-    return f"Вы успешно купили {item['brand']} {item['model']} за {price} coins!"
+    return (
+        f"Вы успешно купили "
+        f"{item['brand']} {item['model']} "
+        f"за {item['price']} coins!"
+    )

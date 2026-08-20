@@ -198,8 +198,8 @@ async def setup_aiohttp_app(  # noqa: RUF029
     app["bot"] = bot
     app["dp"] = dp
     app["scheduler"] = scheduler
-    app.on_startup.append(aiohttp_on_startup)  # type: ignore[arg-type]
-    app.on_shutdown.append(aiohttp_on_shutdown)  # type: ignore[arg-type]
+    app.on_startup.append(aiohttp_on_startup)
+    app.on_shutdown.append(aiohttp_on_shutdown)
     return app
 
 

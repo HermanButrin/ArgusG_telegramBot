@@ -91,7 +91,7 @@ class DefaultConstructor:
                     )
             else:
                 raise TypeError("unknown action type")  # noqa: TRY003, EM101
-            btns.append(KeyboardButton(**data))  # type:ignore[arg-type]
+            btns.append(KeyboardButton(**data))  # type: ignore[arg-type]
         kb = ReplyKeyboardMarkup(
             resize_keyboard=resize_keyboard,
             selective=selective,

@@ -86,7 +86,7 @@ class InlineConstructor:
                 if len(btns) != 0 and data["pay"]:
                     raise exceptions.PaymentButtonMustBeFirstError
                 data["pay"] = cur_action["pay"]
-            btns.append(InlineKeyboardButton(**data))  # type:ignore[arg-type]
+            btns.append(InlineKeyboardButton(**data))  # type: ignore[arg-type]
         kb = InlineKeyboardMarkup(
             inline_keyboard=schema_generator.create_keyboard_layout(btns, schema),
         )
